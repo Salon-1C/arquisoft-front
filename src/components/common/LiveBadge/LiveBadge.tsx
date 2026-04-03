@@ -1,0 +1,3 @@
+export default function LiveBadge() {
+  return <div>LiveBadge</div>
+}
