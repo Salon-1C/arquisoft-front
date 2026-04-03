@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import '@/styles/globals.css'
+import { sora } from '@/lib/fonts'
 import { AuthProvider } from '@/context/AuthContext'
 import { ModalProvider } from '@/context/ModalContext'
 import AuthModal from '@/components/common/AuthModal/AuthModal'
@@ -15,7 +16,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="es">
+    <html lang="es" className={sora.variable}>
       <body>
         <AuthProvider>
           <ModalProvider>
