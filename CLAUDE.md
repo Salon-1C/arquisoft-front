@@ -14,6 +14,8 @@ Blume is a live class streaming platform (public and private). Frontend built wi
 - When in doubt, ask before proceeding
 - Never modify files outside the explicit scope of the current prompt
 - Every session must end with the project in a state that compiles without errors
+- All page components with dynamic segments (`[id]`, `[slug]`, etc.) must be `async` and must `await params` before accessing values. `params` is a `Promise<>` in Next.js 16.
+- After adding new dynamic routes, run `npx next typegen` to regenerate the global `PageProps` types.
 
 ### TypeScript
 - Strict typing always. Using `any` is forbidden
@@ -126,7 +128,7 @@ src/
 │       ├── classes.ts
 │       └── notes.ts
 │
-├── middleware.ts
+├── proxy.ts
 │
 ├── styles/
 │   └── globals.css                    ← CSS variables, Tailwind base, Sora import
@@ -227,17 +229,19 @@ All defined as CSS variables in `src/styles/globals.css`.
 
 ## Middleware
 
-`src/middleware.ts` protects the following routes:
+`src/proxy.ts` protects the following routes:
 
 - `/mis-notas` → requires auth
 - `/configuracion` → requires auth
 - `/onboarding` → requires auth
 
 Redirects to `/login?redirect=[path]` when there is no active session.
-
 Redirects to `/explorar` if an authenticated user tries to access `/login` or `/registro`.
 
 In development, reads `AUTH_MOCK_MODE` from `src/config/dev.ts`.
+
+**Note:** In Next.js 16, `middleware.ts` is deprecated. This project uses `proxy.ts` which runs
+on the Node.js runtime. Do not create or reference `middleware.ts`.
 
 ---
 
