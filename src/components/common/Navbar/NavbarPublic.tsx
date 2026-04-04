@@ -15,6 +15,7 @@ export default function NavbarPublic() {
             alt="Blume logo"
             width={25}
             height={25}
+            style={{ width: 25, height: 'auto' }}
           />
           <span className="text-lg font-semibold text-primary">Blume</span>
         </Link>

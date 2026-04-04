@@ -72,6 +72,7 @@ export default function HeroSection() {
               src="/static/hero_section_image.png"
               alt="Clase en vivo en Blume"
               fill
+              sizes="(max-width: 1024px) 90vw, 45vw"
               className="object-cover"
               priority
             />
