@@ -7,7 +7,7 @@ import ArrowButton from '@/components/ui/ArrowButton'
 export default function NavbarPublic() {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-white/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-6 md:px-12 py-2 md:py-3">
+      <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-6 md:px-12 py-3 md:py-3">
         {/* Logo + wordmark */}
         <Link href="/" className="flex items-center gap-3">
           <Image
