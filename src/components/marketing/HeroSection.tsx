@@ -92,7 +92,7 @@ export default function HeroSection() {
                   key={letter}
                   onClick={() => setAnswer(letter)}
                   className={cn(
-                    'flex w-full cursor-pointer items-center gap-2 rounded-lg border px-2 py-1 text-left transition-colors',
+                    'flex w-full cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 text-left transition-colors',
                     answer === letter
                       ? 'border-primary/40 bg-primary/10'
                       : 'border-border/50 hover:border-border'
@@ -106,11 +106,11 @@ export default function HeroSection() {
                   )}>
                     {letter}
                   </span>
-                  <span className="text-[11px] text-foreground">{text}</span>
+                  <span className="text-[11px] text-muted-foreground">{text}</span>
                 </button>
               ))}
             </div>
-            <div className="mt-4 cursor-default rounded-lg bg-primary px-4 py-2 text-center text-xs font-semibold text-white transition-colors hover:bg-primary/90">
+            <div className="mt-4 rounded-lg bg-primary px-4 py-2 text-center text-xs font-semibold text-white transition-colors cursor-pointer hover:bg-primary/90">
               Enviar
             </div>
           </div>
@@ -150,7 +150,7 @@ export default function HeroSection() {
               No
             </button>
           </div>
-          <div className="cursor-default rounded-lg bg-primary px-4 py-2 text-center text-xs font-semibold text-white transition-colors hover:bg-primary/90">
+          <div className="cursor-pointer rounded-lg bg-primary px-4 py-2 text-center text-xs font-semibold text-white transition-colors hover:bg-primary/90">
             Enviar
           </div>
         </div>

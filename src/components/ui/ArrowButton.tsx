@@ -9,7 +9,7 @@ export default function ArrowButton({ href, children }: ArrowButtonProps) {
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-6 rounded-full bg-primary transition-all hover:bg-accent-foreground pl-4 pr-1 py-1 text-white text-base"
+      className="inline-flex items-center gap-6 rounded-full bg-primary transition-all hover:bg-primary/90 pl-4 pr-1 py-1 text-white text-base"
     >
       <span>{children}</span>
       <span className="flex size-7 items-center justify-center rounded-full bg-white">
