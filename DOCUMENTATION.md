@@ -62,7 +62,7 @@ OBS / Streaming software
 
 ### Fase 3 — Backend integration
 - Integración con Spring Boot API (auth, clases, notas)
-- Integración con servicio de streaming en Go (Gin + FFmpeg + Cloudflare R2)
+- Integración con servicio de streaming en Golang + Gin + Cloudflare R2
 - Sustitución del mock `AUTH_MOCK_MODE` por JWT cookie real
 - SSE viewer counts conectados al servidor Go (`/sse/viewers/:classId`)
 

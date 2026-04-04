@@ -291,6 +291,16 @@ or use query param auth in Phase 3). `AllowCredentials` is `false` here.
 
 ---
 
+## Environment variables (base URLs)
+
+```
+Spring Boot:   http://localhost:8080/api   (Backend API)
+Golang + Gin:  http://localhost:9090       (Streaming Server — SSE + internal API)
+Cloudflare R2: https://cdn.blume.app      (HLS segments CDN — not a server you run)
+```
+
+---
+
 ## Error format (both services)
 
 All error responses use the same envelope:

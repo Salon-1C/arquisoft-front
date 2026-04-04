@@ -131,13 +131,22 @@ src/
 ├── hooks/
 │   ├── useAuth.ts
 │   ├── useRequireAuth.ts
-│   └── useRedirectIfAuth.ts
+│   ├── useRedirectIfAuth.ts
+│   └── useViewerCount.ts
 │
 ├── lib/
-│   └── api/
-│       ├── auth.ts
-│       ├── classes.ts
-│       └── notes.ts
+│   ├── api/
+│   │   ├── auth.ts
+│   │   ├── classes.ts
+│   │   └── notes.ts
+│   ├── mocks/
+│   │   ├── data/
+│   │   │   ├── classes.ts
+│   │   │   ├── notes.ts
+│   │   │   └── user.ts
+│   │   └── index.ts
+│   └── stream/
+│       └── viewer-count.ts
 │
 ├── proxy.ts
 │
@@ -148,6 +157,7 @@ src/
     ├── auth.ts
     ├── class.ts
     ├── note.ts
+    ├── stream.ts
     └── api.ts
 ```
 
@@ -183,11 +193,12 @@ export interface Class {
   title: string
   description: string
   instructorName: string
+  instructorAvatarUrl?: string
   status: ClassStatus
   type: ClassType
   thumbnailUrl?: string
-  viewerCount?: number
   startedAt: string
+  endedAt?: string
 }
 ```
 
@@ -197,10 +208,24 @@ export interface Note {
   id: string
   userId: string
   classId?: string
-  className?: string
+  classTitle?: string
   content: string
   createdAt: string
   updatedAt: string
+}
+```
+
+### stream.ts
+```ts
+export interface StreamSession {
+  classId: string
+  hlsUrl: string | undefined
+  initialViewerCount: number
+}
+
+export interface ClassWithSession {
+  class: Class
+  session: StreamSession | undefined
 }
 ```
 
@@ -238,9 +263,12 @@ All defined as CSS variables in `src/styles/globals.css`.
 
 ---
 
-## Middleware
+## Route guard (proxy.ts)
 
 `src/proxy.ts` protects the following routes:
+
+**Note:** In Next.js 16, `middleware.ts` is deprecated. This project uses `proxy.ts` which
+runs on the Node.js runtime. Do not create or use `middleware.ts`.
 
 - `/mis-notas` → requires auth
 - `/configuracion` → requires auth
@@ -250,9 +278,6 @@ Redirects to `/login?redirect=[path]` when there is no active session.
 Redirects to `/explorar` if an authenticated user tries to access `/login` or `/registro`.
 
 In development, reads `AUTH_MOCK_MODE` from `src/config/dev.ts`.
-
-**Note:** In Next.js 16, `middleware.ts` is deprecated. This project uses `proxy.ts` which runs
-on the Node.js runtime. Do not create or reference `middleware.ts`.
 
 ---
 
@@ -287,3 +312,14 @@ chore: short description
 - Real Spring Boot integration — everything is mocked until Phase 3
 - Go + Gin + FFmpeg streaming service integration — pending Phase 3
 - RTMP ingestion (port 1935) and HLS serving via Cloudflare R2 — pending Phase 3
+
+---
+
+## Streaming Server (reference — not part of this repo)
+
+The Golang streaming server uses **Gin** as its HTTP framework.
+- Port 1935 (TCP) — RTMP ingestion from OBS or streaming software
+- Port 9090 (HTTP via Gin) — SSE viewer counts, internal API for Spring Boot
+
+The frontend connects to port 9090 directly for SSE (`useViewerCount` hook).
+HLS video segments are served from **Cloudflare R2** (CDN), not from the Go server.

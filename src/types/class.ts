@@ -6,9 +6,10 @@ export interface Class {
   title: string
   description: string
   instructorName: string
+  instructorAvatarUrl?: string
   status: ClassStatus
   type: ClassType
   thumbnailUrl?: string
-  viewerCount?: number
   startedAt: string
+  endedAt?: string
 }
