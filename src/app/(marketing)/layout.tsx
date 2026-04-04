@@ -6,9 +6,9 @@ interface MarketingLayoutProps {
 
 export default function MarketingLayout({ children }: MarketingLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex h-dvh flex-col">
       <NavbarPublic />
-      <main className="flex-1">
+      <main className="min-h-0 flex-1">
         {children}
       </main>
     </div>
