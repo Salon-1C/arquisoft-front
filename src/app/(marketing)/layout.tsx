@@ -8,7 +8,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
   return (
     <div className="flex h-dvh flex-col">
       <NavbarPublic />
-      <main className="min-h-0 flex-1">
+      <main className="min-h-0 flex-1 overflow-y-auto">
         {children}
       </main>
     </div>
