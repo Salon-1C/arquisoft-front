@@ -2,7 +2,18 @@
 
 ## What is this project
 
-Blume is a live class streaming platform (public and private). Frontend built with Next.js 15 App Router, TypeScript, Tailwind CSS, and shadcn/ui. Authentication backend is Spring Boot (Java) and streaming backend is Golang. This file guides every Claude Code session.
+Blume is a live class streaming platform (public and private). Frontend built with Next.js 16 App Router, TypeScript, Tailwind CSS v4, and shadcn/ui. Authentication backend is Spring Boot (Java) and streaming backend is Golang + Gin. This file guides every Claude Code session.
+
+| Component | Technology |
+|---|---|
+| Frontend | Next.js 16 + TypeScript + Tailwind CSS v4 + shadcn/ui |
+| Backend API | Spring Boot (Java) + PostgreSQL |
+| Streaming Server | Golang + Gin + FFmpeg + Cloudflare R2 |
+
+**Streaming Server framework:** Gin (github.com/gin-gonic/gin). Chosen for native SSE support,
+largest Go community, and lowest learning curve. The server exposes:
+- Port 1935 (TCP) — RTMP ingestion from OBS/streaming software
+- Port 9090 (HTTP via Gin) — HLS serving, SSE viewer count, internal API
 
 ---
 
@@ -274,4 +285,5 @@ chore: short description
 - Post-class recordings — `recorded` type exists, no viewing flow yet
 - Instructor class management — no screens or logic
 - Real Spring Boot integration — everything is mocked until Phase 3
-- Go streaming service integration — pending Phase 3
+- Go + Gin + FFmpeg streaming service integration — pending Phase 3
+- RTMP ingestion (port 1935) and HLS serving via Cloudflare R2 — pending Phase 3
