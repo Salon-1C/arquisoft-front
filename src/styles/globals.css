@@ -85,7 +85,7 @@
   --ring:                oklch(0.48 0.19 293);
 
   /* Sidebar */
-  --sidebar:                       oklch(0.97 0.005 293);
+  --sidebar:                       oklch(1 0 0);
   --sidebar-foreground:            oklch(0.25 0 0);
   --sidebar-primary:               oklch(0.48 0.19 293);
   --sidebar-primary-foreground:    oklch(0.99 0 0);
@@ -165,4 +165,5 @@
 [data-slot="sidebar-container"] {
   top: 50px;
   height: calc(100svh - 50px);
+  border-right: none;
 }
