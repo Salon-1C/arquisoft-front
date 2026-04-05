@@ -138,6 +138,15 @@
 }
 
 @layer components {
+  /* Card appear animation — plays when card enters the DOM (search filter) */
+  @keyframes card-appear {
+    from { opacity: 0; transform: translateY(-5px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-card-appear {
+    animation: card-appear 180ms ease forwards;
+  }
+
   /* Live badge pulse */
   .live-pulse {
     animation: pulse-live 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
