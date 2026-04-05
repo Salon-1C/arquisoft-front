@@ -77,20 +77,19 @@ src/
 │   ├── (marketing)/                   ← Landing. Public navbar + footer.
 │   │   ├── layout.tsx
 │   │   └── page.tsx
-│   ├── (public)/                      ← No auth required. Navbar with "Sign in".
-│   │   ├── layout.tsx
-│   │   ├── explorar/page.tsx
-│   │   └── clase/[id]/page.tsx
 │   ├── (auth)/                        ← Clean centered layout.
 │   │   ├── layout.tsx
 │   │   ├── login/page.tsx
 │   │   ├── registro/page.tsx
 │   │   └── onboarding/page.tsx
-│   └── (dashboard)/                   ← Auth required. Sidebar + user navbar.
-│       ├── layout.tsx
-│       ├── explorar/page.tsx
-│       ├── mis-notas/page.tsx
-│       └── configuracion/page.tsx
+│   ├── (app)/                        ← Sidebar always visible. Auth optional.
+│   │   ├── layout.tsx
+│   │   ├── explorar/page.tsx         ← Public. No auth required.
+│   │   ├── mis-notas/page.tsx        ← Auth required (proxy.ts).
+│   │   └── configuracion/page.tsx    ← Auth required (proxy.ts).
+│   └── clase/
+│       └── [id]/
+│           └── page.tsx              ← Full-screen. No sidebar.
 │
 ├── components/
 │   ├── ui/                            ← shadcn (do not edit manually)
@@ -323,3 +322,17 @@ The Golang streaming server uses **Gin** as its HTTP framework.
 
 The frontend connects to port 9090 directly for SSE (`useViewerCount` hook).
 HLS video segments are served from **Cloudflare R2** (CDN), not from the Go server.
+
+---
+
+## Sidebar auth behavior
+
+The sidebar (`AppSidebar`) is always visible inside `(app)` pages. Protected tabs do NOT
+redirect to login — they call `openAuthModal()` instead. Only `proxy.ts` redirects to login
+(for full-page access to `/mis-notas` and `/configuracion`).
+
+Tab behavior:
+- Explorar clases → always navigates, no auth check
+- Unirme a un salón → auth required, shows modal if not authenticated, full behavior TBD
+- Mis notas → auth required, shows modal if not authenticated
+- Configuración → auth required, shows modal if not authenticated
