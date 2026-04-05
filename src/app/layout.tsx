@@ -8,6 +8,9 @@ import AuthModal from '@/components/common/AuthModal/AuthModal'
 export const metadata: Metadata = {
   title: 'Blume',
   description: 'Aprende en vivo con Blume',
+  icons: {
+    icon: '/static/logo.png',
+  },
 }
 
 interface RootLayoutProps {
