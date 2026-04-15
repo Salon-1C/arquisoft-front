@@ -1,33 +1,19 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { AUTH_MOCK_MODE } from '@/config/dev'
 
 // Routes that require authentication
 const PROTECTED_ROUTES = ['/mis-notas', '/configuracion', '/onboarding']
 
-// Routes that should redirect authenticated users away
-const AUTH_ROUTES = ['/login', '/registro']
 
-function isAuthenticated(): boolean {
-  // In development, read from the mock flag
-  // In production, this will read the JWT cookie from the request
-  return AUTH_MOCK_MODE === 'authenticated'
+function isAuthenticated(request: NextRequest): boolean {
+  return request.cookies.has('blume_session')
 }
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  const authenticated = isAuthenticated()
+  const authenticated = isAuthenticated(request)
 
-  // Redirect authenticated users away from login/registro
-  if (AUTH_ROUTES.some((route) => pathname.startsWith(route))) {
-    if (authenticated) {
-      return NextResponse.redirect(new URL('/explorar', request.url))
-    }
-    return NextResponse.next()
-  }
-
-  // Protect dashboard routes
   if (PROTECTED_ROUTES.some((route) => pathname.startsWith(route))) {
     if (!authenticated) {
       const redirectUrl = new URL('/login', request.url)

@@ -2,8 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { login } from '@/lib/api/auth'
+import { useAuth } from '@/hooks/useAuth'
 
 interface LoginForm {
   email: string
@@ -13,16 +16,29 @@ interface LoginForm {
 export default function LoginPage() {
   const [form, setForm] = useState<LoginForm>({ email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const { login: setSession } = useAuth()
+  const router = useRouter()
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target
     setForm(prev => ({ ...prev, [name]: value }))
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    // TODO: call login(form.email, form.password) from @/lib/api/auth
-    // TODO: handle loading, error and redirect states
+    setError(null)
+    setLoading(true)
+    try {
+      const session = await login(form.email, form.password)
+      setSession(session)
+      router.replace('/explorar')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al iniciar sesión')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -85,8 +101,12 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button type="submit" size="lg" className="w-full cursor-pointer rounded-lg">
-              Ingresar
+            {error && (
+              <p className="text-sm text-destructive">{error}</p>
+            )}
+
+            <Button type="submit" size="lg" className="w-full cursor-pointer rounded-lg" disabled={loading}>
+              {loading ? 'Ingresando...' : 'Ingresar'}
             </Button>
 
             <p className="mt-4 text-sm text-muted-foreground">
