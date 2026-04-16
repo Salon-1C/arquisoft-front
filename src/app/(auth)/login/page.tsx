@@ -7,6 +7,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { login } from '@/lib/api/auth'
 import { useAuth } from '@/hooks/useAuth'
+import GoogleSignInButton from '@/components/common/GoogleSignInButton/GoogleSignInButton'
 
 interface LoginForm {
   email: string
@@ -108,6 +109,14 @@ export default function LoginPage() {
             <Button type="submit" size="lg" className="w-full cursor-pointer rounded-lg" disabled={loading}>
               {loading ? 'Ingresando...' : 'Ingresar'}
             </Button>
+
+            <div className="relative flex items-center">
+              <div className="flex-1 border-t border-border" />
+              <span className="mx-3 text-xs text-muted-foreground">o</span>
+              <div className="flex-1 border-t border-border" />
+            </div>
+
+            <GoogleSignInButton />
 
             <p className="mt-4 text-sm text-muted-foreground">
               ¿No tienes cuenta?{' '}

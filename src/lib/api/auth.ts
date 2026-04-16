@@ -44,6 +44,17 @@ export async function logout(): Promise<void> {
   })
 }
 
+export async function firebaseLogin(idToken: string): Promise<Session> {
+  const res = await fetch(`${API_URL}/api/auth/firebase/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ idToken }),
+  })
+  const { data } = await handleResponse<ApiResponse<User>>(res)
+  return toSession(data)
+}
+
 export async function getMe(): Promise<User | null> {
   const res = await fetch(`${API_URL}/api/auth/me`, {
     credentials: 'include',
