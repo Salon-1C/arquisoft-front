@@ -29,6 +29,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = () => {
     setUser(null)
+    apiLogout().catch(() => {})
   }
 
   return (

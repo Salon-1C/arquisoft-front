@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ChevronUp, Compass, LogIn, LogOut, NotebookPen, Settings } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { useModal } from '@/hooks/useModal'
 import { Button } from '@/components/ui/button'
@@ -33,7 +33,13 @@ interface NavItem {
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const { isAuthenticated, user, logout } = useAuth()
+
+  function handleLogout() {
+    logout()
+    router.replace('/')
+  }
   const { openAuthModal } = useModal()
 
   const navItems: NavItem[] = [
@@ -143,7 +149,7 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
-                  <DropdownMenuItem className="cursor-pointer" onClick={logout}>
+                  <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
                     <LogOut />
                     <span>Cerrar sesión</span>
                   </DropdownMenuItem>
