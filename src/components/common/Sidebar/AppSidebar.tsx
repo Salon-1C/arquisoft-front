@@ -131,7 +131,7 @@ export function AppSidebar() {
             <SidebarMenuItem>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton size="lg" className="cursor-pointer">
+                  <SidebarMenuButton size="lg" className="cursor-pointer focus-visible:ring-0 focus-visible:outline-none data-[state=open]:ring-0">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
                       {user.name.charAt(0).toUpperCase()}
                     </div>
