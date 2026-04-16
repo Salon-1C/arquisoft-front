@@ -6,12 +6,17 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { Compass, LogIn, NotebookPen, Settings } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { ChevronUp, Compass, LogIn, LogOut, NotebookPen, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
@@ -28,7 +33,7 @@ interface NavItem {
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, user, logout } = useAuth()
   const { openAuthModal } = useModal()
 
   const navItems: NavItem[] = [
@@ -122,15 +127,30 @@ export function AppSidebar() {
       {/* Footer */}
       <SidebarFooter>
         {isAuthenticated && user ? (
-          <div className="flex items-center gap-3 px-3 py-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium leading-none">{user.name}</span>
-              <span className="mt-0.5 text-xs capitalize text-muted-foreground">{user.role}</span>
-            </div>
-          </div>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton size="lg" className="cursor-pointer">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                      {user.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium leading-none">{user.name}</span>
+                      <span className="mt-0.5 text-xs capitalize text-muted-foreground">{user.role}</span>
+                    </div>
+                    <ChevronUp className="ml-auto" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
+                  <DropdownMenuItem className="cursor-pointer" onClick={logout}>
+                    <LogOut />
+                    <span>Cerrar sesión</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
         ) : (
           <div className="flex flex-col gap-2 px-3 py-3">
             <Button asChild variant="default" size="sm" className="w-full cursor-pointer">
