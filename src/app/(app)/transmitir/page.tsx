@@ -18,7 +18,6 @@ export default function TransmitirPage() {
   const [copied, setCopied] = useState<string | null>(null)
 
   const rtmpBase = 'rtmp://localhost:1935/live'
-  const recordingsBase = process.env.NEXT_PUBLIC_RECORDINGS_URL ?? process.env.NEXT_PUBLIC_API_URL ?? ''
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
@@ -32,17 +31,6 @@ export default function TransmitirPage() {
       })
       if (!res.ok) throw new Error('Error al crear el stream')
       const { stream } = (await res.json()) as { stream: StreamRecord }
-      // Best-effort sync so past recordings reuse the same title/description.
-      await fetch(`${recordingsBase}/internal/streams/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          streamKey: stream.streamKey,
-          title: stream.name,
-          description: stream.description,
-          instructorName: stream.instructorName,
-        }),
-      }).catch(() => undefined)
       setStreams((prev) => [...prev, { ...stream, rtmpUrl: `${rtmpBase}/${stream.streamKey}` }])
       setName('')
       setDescription('')
