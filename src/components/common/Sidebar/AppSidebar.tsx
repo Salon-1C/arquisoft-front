@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ChevronUp, Compass, LogIn, LogOut, NotebookPen, Settings } from 'lucide-react'
+import { BookOpen, ChevronUp, Compass, LogIn, LogOut, NotebookPen, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
@@ -48,6 +48,12 @@ export function AppSidebar() {
       icon: Compass,
       href: '/explorar',
       requiresAuth: false,
+    },
+    {
+      label: 'Mis Cursos',
+      icon: BookOpen,
+      href: '/cursos',
+      requiresAuth: true,
     },
     {
       label: 'Unirme a un salón',
