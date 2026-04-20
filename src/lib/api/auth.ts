@@ -1,13 +1,55 @@
-import type { Session } from '@/types/auth'
+import { apiFetch } from './client'
+import type { Session, User, UserRole } from '@/types/auth'
 
-export async function login(_email: string, _password: string): Promise<Session> {
-  throw new Error('Not implemented')
+interface UserResponse {
+  id: string
+  email: string
+  name: string
+  role: string
+  avatarUrl: string | null
 }
 
-export async function signup(_email: string, _password: string): Promise<Session> {
-  throw new Error('Not implemented')
+function toUser(u: UserResponse): User {
+  return {
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    role: u.role as UserRole,
+    avatarUrl: u.avatarUrl ?? undefined,
+  }
+}
+
+export async function login(email: string, password: string): Promise<Session> {
+  const res = await apiFetch<UserResponse>('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  })
+  // The JWT is stored in the blume_session cookie by the server.
+  // We only need the user profile client-side.
+  return { user: toUser(res.data), token: '' }
+}
+
+export async function signup(
+  email: string,
+  password: string,
+  fullName?: string
+): Promise<Session> {
+  const res = await apiFetch<UserResponse>('/api/auth/registro', {
+    method: 'POST',
+    body: JSON.stringify({ email, password, fullName: fullName ?? '' }),
+  })
+  return { user: toUser(res.data), token: '' }
 }
 
 export async function logout(): Promise<void> {
-  throw new Error('Not implemented')
+  await apiFetch<null>('/api/auth/logout', { method: 'POST' })
+}
+
+export async function getMe(): Promise<User | null> {
+  try {
+    const res = await apiFetch<UserResponse>('/api/auth/me')
+    return toUser(res.data)
+  } catch {
+    return null
+  }
 }

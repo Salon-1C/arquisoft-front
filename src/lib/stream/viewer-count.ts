@@ -1,29 +1,35 @@
-import { MOCK_VIEWER_COUNTS } from '@/lib/mocks'
-
+// Polls /api/stats on the stream-engine every 5 s to get the current viewer
+// count. The classId parameter is accepted for API compatibility with the hook
+// but is not used — stream-engine tracks a single global viewer count.
 export function createViewerCountSSE(
-  classId: string,
+  _classId: string,
   onUpdate: (count: number) => void
 ): () => void {
-  const initial = MOCK_VIEWER_COUNTS[classId] ?? 0
-  onUpdate(initial)
+  const streamUrl = process.env.NEXT_PUBLIC_STREAM_URL
 
-  const interval = setInterval(() => {
-    const current = MOCK_VIEWER_COUNTS[classId] ?? 0
-    const delta = Math.random() > 0.5 ? 1 : -1
-    const next = Math.max(0, current + delta)
-    MOCK_VIEWER_COUNTS[classId] = next
-    onUpdate(next)
-  }, 8000)
+  if (!streamUrl) {
+    onUpdate(0)
+    return () => {}
+  }
 
-  return () => clearInterval(interval)
+  let active = true
 
-  // Phase 3 — connect to Go + Gin SSE endpoint (port 9090):
-  // const streamUrl = process.env.NEXT_PUBLIC_STREAM_URL  // e.g. http://localhost:9090
-  // const source = new EventSource(`${streamUrl}/sse/viewers/${classId}`)
-  // source.onmessage = (e) => {
-  //   const { count } = JSON.parse(e.data)
-  //   onUpdate(count)
-  // }
-  // source.onerror = () => source.close()
-  // return () => source.close()
+  const poll = async () => {
+    try {
+      const res = await fetch(`${streamUrl}/api/stats`)
+      if (!res.ok) return
+      const data = (await res.json()) as { viewers: number }
+      if (active) onUpdate(data.viewers)
+    } catch {
+      // network failure — silently skip this tick
+    }
+  }
+
+  void poll()
+  const interval = setInterval(() => void poll(), 5000)
+
+  return () => {
+    active = false
+    clearInterval(interval)
+  }
 }
