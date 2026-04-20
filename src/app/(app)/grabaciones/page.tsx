@@ -12,9 +12,9 @@ function formatDate(raw: string): string {
 export default function GrabacionesPage() {
   const [recordings, setRecordings] = useState<Recording[]>([])
   const [error, setError] = useState<string | null>(null)
+  const base = process.env.NEXT_PUBLIC_RECORDINGS_URL ?? process.env.NEXT_PUBLIC_API_URL ?? ''
 
   useEffect(() => {
-    const base = process.env.NEXT_PUBLIC_RECORDINGS_URL ?? process.env.NEXT_PUBLIC_API_URL ?? ''
     fetch(`${base}/api/recordings?limit=50&offset=0`)
       .then(async (res) => {
         if (!res.ok) throw new Error(`Error HTTP ${res.status}`)
@@ -61,13 +61,26 @@ export default function GrabacionesPage() {
                   </div>
                 </dl>
                 <div className="mt-4">
+                  <video
+                    controls
+                    preload="metadata"
+                    className="w-full rounded-md border bg-black"
+                    src={`${base}/api/recordings/${rec.id}/play`}
+                  />
+                </div>
+                <div className="mt-3 flex items-center gap-4">
                   <a
-                    href={rec.playbackUrl}
-                    target="_blank"
-                    rel="noreferrer"
+                    href={`${base}/api/recordings/${rec.id}/play`}
                     className="text-sm font-medium text-primary underline underline-offset-4"
                   >
-                    Ver grabacion
+                    Ver en navegador
+                  </a>
+                  <a
+                    href={`${base}/api/recordings/${rec.id}/play?download=1`}
+                    className="text-sm font-medium text-primary underline underline-offset-4"
+                    download
+                  >
+                    Descargar
                   </a>
                 </div>
               </article>
