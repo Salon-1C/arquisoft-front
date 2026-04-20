@@ -17,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ChevronUp, Compass, LogIn, LogOut, NotebookPen, Radio, Settings, UserRound, GraduationCap } from 'lucide-react'
+import { ChevronUp, Compass, History, LogIn, LogOut, NotebookPen, Radio, Settings, UserRound, GraduationCap } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
@@ -61,6 +61,12 @@ export function AppSidebar() {
       icon: NotebookPen,
       href: '/mis-notas',
       requiresAuth: true,
+    },
+    {
+      label: 'Transmisiones pasadas',
+      icon: History,
+      href: '/grabaciones',
+      requiresAuth: false,
     },
     {
       label: 'Configuración',
