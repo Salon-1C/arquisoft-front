@@ -12,15 +12,9 @@ function formatDate(raw: string): string {
 export default function GrabacionesPage() {
   const [recordings, setRecordings] = useState<Recording[]>([])
   const [error, setError] = useState<string | null>(null)
-<<<<<<< HEAD
   const base = process.env.NEXT_PUBLIC_RECORDINGS_URL ?? process.env.NEXT_PUBLIC_API_URL ?? ''
 
   useEffect(() => {
-=======
-
-  useEffect(() => {
-    const base = process.env.NEXT_PUBLIC_RECORDINGS_URL ?? process.env.NEXT_PUBLIC_API_URL ?? ''
->>>>>>> 1a3188f (update front for recordings)
     fetch(`${base}/api/recordings?limit=50&offset=0`)
       .then(async (res) => {
         if (!res.ok) throw new Error(`Error HTTP ${res.status}`)
@@ -67,7 +61,6 @@ export default function GrabacionesPage() {
                   </div>
                 </dl>
                 <div className="mt-4">
-<<<<<<< HEAD
                   <video
                     controls
                     preload="metadata"
@@ -88,15 +81,6 @@ export default function GrabacionesPage() {
                     download
                   >
                     Descargar
-=======
-                  <a
-                    href={rec.playbackUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm font-medium text-primary underline underline-offset-4"
-                  >
-                    Ver grabacion
->>>>>>> 1a3188f (update front for recordings)
                   </a>
                 </div>
               </article>
