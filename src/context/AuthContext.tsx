@@ -1,8 +1,8 @@
 'use client'
 
 import { createContext, useState, useEffect } from 'react'
-import { getMe, logout as apiLogout } from '@/lib/api/auth'
 import type { AuthContextType, Session, User } from '@/types/auth'
+import { getMe, logout as apiLogout } from '@/lib/api/auth'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
@@ -28,6 +28,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const logout = () => {
+    apiLogout().catch(() => {})
     setUser(null)
     apiLogout().catch(() => {})
   }
