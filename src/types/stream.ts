@@ -2,12 +2,13 @@ import type { Class } from '@/types/class'
 
 export interface StreamSession {
   classId: string
-  // Direct URL to Cloudflare R2 — served by Go + Gin streaming server.
-  // In development: undefined. VideoPlayer must handle this gracefully with a placeholder.
-  // In production: `${NEXT_PUBLIC_STREAM_URL}/hls/{classId}/index.m3u8`
-  hlsUrl: string | undefined
+  // WHEP path consumed by VideoPlayer to open a WebRTC (WHEP) connection via
+  // stream-engine. Format: `/live/<STREAM_KEY>`.
+  // In development: use NEXT_PUBLIC_STREAM_KEY env var.
+  // undefined when the class is in 'recorded' status (no live stream).
+  streamPath: string | undefined
   // Initial viewer count from the REST response.
-  // This value is stale — use useViewerCount hook for live updates via SSE.
+  // This value is stale — use useViewerCount hook for live updates via polling.
   initialViewerCount: number
 }
 

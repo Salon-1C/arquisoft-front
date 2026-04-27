@@ -1,8 +1,8 @@
 'use client'
 
 import { createContext, useState, useEffect } from 'react'
-import { getMe, logout as apiLogout } from '@/lib/api/auth'
 import type { AuthContextType, Session, User } from '@/types/auth'
+import { getMe, logout as apiLogout } from '@/lib/api/auth'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
@@ -14,12 +14,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  // Restore session from the blume_session cookie on mount.
   useEffect(() => {
     getMe()
-      .then((u) => {
-        setUser(u)
-        if (!u) apiLogout().catch(() => {})
-      })
+      .then(setUser)
       .finally(() => setIsLoading(false))
   }, [])
 
@@ -28,8 +26,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const logout = () => {
-    setUser(null)
     apiLogout().catch(() => {})
+    setUser(null)
   }
 
   return (

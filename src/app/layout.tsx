@@ -3,6 +3,7 @@ import '@/styles/globals.css'
 import { sora } from '@/lib/fonts'
 import { AuthProvider } from '@/context/AuthContext'
 import { ModalProvider } from '@/context/ModalContext'
+import { ViewModeProvider } from '@/context/ViewModeContext'
 import AuthModal from '@/components/common/AuthModal/AuthModal'
 
 export const metadata: Metadata = {
@@ -22,10 +23,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="es" className={sora.variable}>
       <body>
         <AuthProvider>
-          <ModalProvider>
-            {children}
-            <AuthModal />
-          </ModalProvider>
+          <ViewModeProvider>
+            <ModalProvider>
+              {children}
+              <AuthModal />
+            </ModalProvider>
+          </ViewModeProvider>
         </AuthProvider>
       </body>
     </html>

@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { signup } from '@/lib/api/auth'
+import { ApiError } from '@/lib/api/client'
 import { useAuth } from '@/hooks/useAuth'
-import GoogleSignInButton from '@/components/common/GoogleSignInButton/GoogleSignInButton'
 
 interface RegisterForm {
   email: string
@@ -34,9 +34,15 @@ export default function RegistroPage() {
     try {
       const session = await signup(form.email, form.password)
       setSession(session)
-      router.replace('/explorar')
+      router.push('/onboarding')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear la cuenta')
+      if (err instanceof ApiError && err.status === 409) {
+        setError('Ya existe una cuenta con ese correo')
+      } else if (err instanceof ApiError && err.status === 400) {
+        setError('La contraseña debe tener al menos 8 caracteres')
+      } else {
+        setError('No se pudo crear la cuenta. Intenta de nuevo.')
+      }
     } finally {
       setLoading(false)
     }
@@ -73,6 +79,7 @@ export default function RegistroPage() {
                 placeholder="micorreo@gmail.com"
                 value={form.email}
                 onChange={handleChange}
+                required
                 className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground transition focus:outline-none focus:ring-2 focus:ring-ring/50"
               />
             </div>
@@ -89,6 +96,8 @@ export default function RegistroPage() {
                   autoComplete="new-password"
                   value={form.password}
                   onChange={handleChange}
+                  required
+                  minLength={8}
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 pr-10 text-sm text-foreground transition focus:outline-none focus:ring-2 focus:ring-ring/50"
                 />
                 <button
@@ -106,17 +115,14 @@ export default function RegistroPage() {
               <p className="text-sm text-destructive">{error}</p>
             )}
 
-            <Button type="submit" size="lg" className="w-full cursor-pointer rounded-lg" disabled={loading}>
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full cursor-pointer rounded-lg"
+              disabled={loading}
+            >
               {loading ? 'Creando cuenta...' : 'Empezar ahora'}
             </Button>
-
-            <div className="relative flex items-center">
-              <div className="flex-1 border-t border-border" />
-              <span className="mx-3 text-xs text-muted-foreground">o</span>
-              <div className="flex-1 border-t border-border" />
-            </div>
-
-            <GoogleSignInButton />
 
             <p className="mt-4 text-sm text-muted-foreground">
               ¿Ya tienes cuenta?{' '}

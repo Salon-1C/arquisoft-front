@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { login } from '@/lib/api/auth'
+import { ApiError } from '@/lib/api/client'
 import { useAuth } from '@/hooks/useAuth'
-import GoogleSignInButton from '@/components/common/GoogleSignInButton/GoogleSignInButton'
 
 interface LoginForm {
   email: string
@@ -34,9 +34,13 @@ export default function LoginPage() {
     try {
       const session = await login(form.email, form.password)
       setSession(session)
-      router.replace('/explorar')
+      router.push('/explorar')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al iniciar sesión')
+      if (err instanceof ApiError && err.status === 401) {
+        setError('Correo o contraseña incorrectos')
+      } else {
+        setError('No se pudo iniciar sesión. Intenta de nuevo.')
+      }
     } finally {
       setLoading(false)
     }
@@ -73,6 +77,7 @@ export default function LoginPage() {
                 placeholder="micorreo@gmail.com"
                 value={form.email}
                 onChange={handleChange}
+                required
                 className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground transition focus:outline-none focus:ring-2 focus:ring-ring/50"
               />
             </div>
@@ -89,6 +94,7 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   value={form.password}
                   onChange={handleChange}
+                  required
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 pr-10 text-sm text-foreground transition focus:outline-none focus:ring-2 focus:ring-ring/50"
                 />
                 <button
@@ -106,17 +112,14 @@ export default function LoginPage() {
               <p className="text-sm text-destructive">{error}</p>
             )}
 
-            <Button type="submit" size="lg" className="w-full cursor-pointer rounded-lg" disabled={loading}>
+            <Button
+              type="submit"
+              size="lg"
+              className="w-full cursor-pointer rounded-lg"
+              disabled={loading}
+            >
               {loading ? 'Ingresando...' : 'Ingresar'}
             </Button>
-
-            <div className="relative flex items-center">
-              <div className="flex-1 border-t border-border" />
-              <span className="mx-3 text-xs text-muted-foreground">o</span>
-              <div className="flex-1 border-t border-border" />
-            </div>
-
-            <GoogleSignInButton />
 
             <p className="mt-4 text-sm text-muted-foreground">
               ¿No tienes cuenta?{' '}
