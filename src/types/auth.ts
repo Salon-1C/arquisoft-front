@@ -4,8 +4,10 @@ export interface User {
   id: string
   email: string
   name: string
+  username?: string
   role: UserRole
   avatarUrl?: string
+  onboardingComplete: boolean
 }
 
 export interface Session {

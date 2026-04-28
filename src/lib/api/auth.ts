@@ -5,8 +5,10 @@ interface UserResponse {
   id: string
   email: string
   name: string
+  username: string | null
   role: string
   avatarUrl: string | null
+  onboardingComplete: boolean
 }
 
 function toUser(u: UserResponse): User {
@@ -14,8 +16,10 @@ function toUser(u: UserResponse): User {
     id: u.id,
     email: u.email,
     name: u.name,
+    username: u.username ?? undefined,
     role: u.role as UserRole,
     avatarUrl: u.avatarUrl ?? undefined,
+    onboardingComplete: u.onboardingComplete,
   }
 }
 
@@ -45,6 +49,14 @@ export async function logout(): Promise<void> {
   await apiFetch<null>('/api/auth/logout', { method: 'POST' })
 }
 
+export async function firebaseLogin(idToken: string): Promise<Session> {
+  const res = await apiFetch<UserResponse>('/api/auth/firebase/login', {
+    method: 'POST',
+    body: JSON.stringify({ idToken }),
+  })
+  return { user: toUser(res.data), token: '' }
+}
+
 export async function getMe(): Promise<User | null> {
   try {
     const res = await apiFetch<UserResponse>('/api/auth/me')
@@ -52,4 +64,15 @@ export async function getMe(): Promise<User | null> {
   } catch {
     return null
   }
+}
+
+export async function completeOnboarding(
+  username: string,
+  roleCode: 'STUDENT' | 'PROFESSOR'
+): Promise<Session> {
+  const res = await apiFetch<UserResponse>('/api/auth/onboarding', {
+    method: 'POST',
+    body: JSON.stringify({ username, roleCode }),
+  })
+  return { user: toUser(res.data), token: '' }
 }

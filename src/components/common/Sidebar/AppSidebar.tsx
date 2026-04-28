@@ -156,10 +156,12 @@ export function AppSidebar() {
                     className="cursor-pointer focus-visible:ring-0 focus-visible:outline-none data-[state=open]:ring-0"
                   >
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-                      {user.name.charAt(0).toUpperCase()}
+                      {(user.username ?? user.name).charAt(0).toUpperCase()}
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium leading-none">{user.name}</span>
+                      <span className="text-sm font-medium leading-none">
+                        {user.username ?? user.name}
+                      </span>
                       <span className="mt-0.5 text-xs capitalize text-muted-foreground">
                         {isProfesor ? 'profesor' : user.role}
                       </span>

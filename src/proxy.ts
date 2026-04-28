@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Routes that require authentication
 const PROTECTED_ROUTES = ['/mis-notas', '/configuracion', '/onboarding']
-
+const AUTH_ROUTES = ['/login', '/registro']
 
 function isAuthenticated(request: NextRequest): boolean {
   return request.cookies.has('blume_session')
@@ -11,7 +10,6 @@ function isAuthenticated(request: NextRequest): boolean {
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
-
   const authenticated = isAuthenticated(request)
 
   if (PROTECTED_ROUTES.some((route) => pathname.startsWith(route))) {
@@ -19,6 +17,12 @@ export function proxy(request: NextRequest) {
       const redirectUrl = new URL('/login', request.url)
       redirectUrl.searchParams.set('redirect', pathname)
       return NextResponse.redirect(redirectUrl)
+    }
+  }
+
+  if (AUTH_ROUTES.some((route) => pathname.startsWith(route))) {
+    if (authenticated) {
+      return NextResponse.redirect(new URL('/explorar', request.url))
     }
   }
 
