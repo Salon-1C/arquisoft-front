@@ -52,12 +52,15 @@ export default function ExplorarClient({ streams }: ExplorarClientProps) {
           <SlidersHorizontal className="size-4" />
         </button>
 
-        <Button
-          onClick={() => setModalOpen(true)}
-          className="hidden cursor-pointer shrink-0 md:inline-flex"
-        >
-          Unirme con código
-        </Button>
+        {/* TODO: restore when join-by-code flow is ready */}
+        {false && (
+          <Button
+            onClick={() => setModalOpen(true)}
+            className="hidden cursor-pointer shrink-0 md:inline-flex"
+          >
+            Unirme con código
+          </Button>
+        )}
       </div>
 
       <StreamGrid streams={filtered} />

@@ -17,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ChevronUp, Compass, History, LogIn, LogOut, NotebookPen, Radio, Settings, UserRound, GraduationCap } from 'lucide-react'
+import { BookOpen, ChevronUp, Compass, DoorOpen, LogOut, Radio, Settings, Sparkles, UserRound, GraduationCap } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
@@ -42,14 +42,20 @@ export function AppSidebar() {
 
   const navItems: NavItem[] = [
     {
+      label: 'Mis clases',
+      icon: BookOpen,
+      href: '/mis-notas',
+      requiresAuth: true,
+    },
+    {
       label: 'Explorar clases',
       icon: Compass,
       href: '/explorar',
       requiresAuth: false,
     },
     {
-      label: 'Unirme a un salón',
-      icon: LogIn,
+      label: 'Unirme a una clase',
+      icon: DoorOpen,
       href: undefined,
       requiresAuth: true,
       onClick: () => {
@@ -57,14 +63,8 @@ export function AppSidebar() {
       },
     },
     {
-      label: 'Mis notas',
-      icon: NotebookPen,
-      href: '/mis-notas',
-      requiresAuth: true,
-    },
-    {
-      label: 'Transmisiones pasadas',
-      icon: History,
+      label: 'Recomendaciones',
+      icon: Sparkles,
       href: '/grabaciones',
       requiresAuth: false,
     },
