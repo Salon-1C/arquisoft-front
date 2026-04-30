@@ -1,13 +1,14 @@
 import type { ApiResponse } from '@/types/api'
 import type { Course } from '@/types/course'
-import { MOCK_COURSES } from '@/lib/mocks'
+import { getEnrolledChannels, getEnrolledChannelAsCourse } from '@/lib/api/channels'
 
 export async function getCourses(): Promise<ApiResponse<Course[]>> {
-  return { data: MOCK_COURSES }
+  const data = await getEnrolledChannels()
+  return { data }
 }
 
 export async function getCourseById(id: string): Promise<ApiResponse<Course>> {
-  const course = MOCK_COURSES.find((c) => c.id === id)
+  const course = await getEnrolledChannelAsCourse(id)
   if (!course) {
     throw new Error(`Course not found: ${id}`)
   }
