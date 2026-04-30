@@ -1,6 +1,8 @@
 import { cookies } from 'next/headers'
 import type { Stream } from '@/types/stream'
+import { getEnrolledChannelAsClassDetail } from '@/lib/api/channels'
 import LiveView from './LiveView'
+import ChannelTabs from '@/components/channels/ChannelTabs'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,21 +46,28 @@ export default async function ClasePage({
     )
   }
 
+  const channelDetail = await getEnrolledChannelAsClassDetail(stream.channelId)
   const streamPath = `/live/${stream.id}`
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8 flex flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-bold">{stream.title}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{stream.description}</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">Por {stream.instructorName}</p>
-      </div>
-      <LiveView
-        classId={id}
-        streamPath={streamPath}
-        initialViewerCount={0}
-        isLive={stream.status === 'live'}
-      />
-    </main>
+    <div className="h-full overflow-y-auto">
+      <main className="mx-auto max-w-4xl px-4 py-8 flex flex-col gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">{stream.title}</h1>
+          <p className="mt-0.5 text-xs text-muted-foreground">Por {stream.instructorName}</p>
+        </div>
+        <LiveView
+          classId={id}
+          streamPath={streamPath}
+          initialViewerCount={0}
+          isLive={stream.status === 'live'}
+        />
+        <ChannelTabs
+          description={channelDetail?.cls.description ?? stream.description}
+          recordings={channelDetail?.recordings ?? []}
+          materials={channelDetail?.materials ?? []}
+        />
+      </main>
+    </div>
   )
 }

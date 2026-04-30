@@ -11,7 +11,7 @@ interface ClassCardProps {
 export default function ClassCard({ cls }: ClassCardProps) {
   return (
     <Link
-      href={`/canal/${cls.id}`}
+      href={`/clase/${cls.liveStreamId ?? cls.id}`}
       className="flex cursor-pointer items-center gap-4 px-5 py-4 transition-shadow
         md:rounded-xl md:bg-background md:hover:shadow-sm"
     >

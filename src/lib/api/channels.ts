@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import type { Course, CourseStream } from '@/types/course'
-import type { Class, ClassDetail, ClassRecording } from '@/types/class'
+import type { Class, ClassDetail, ClassMaterial, ClassRecording } from '@/types/class'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
@@ -13,12 +13,22 @@ interface ChannelStreamResponse {
   endedAt: string | null
 }
 
+interface ChannelMaterialResponse {
+  id: string
+  title: string
+  description?: string
+  fileUrl: string
+  fileType: string
+  createdAt: string
+}
+
 interface ChannelResponse {
   id: string
   name: string
   description: string
   instructorName: string
   streams: ChannelStreamResponse[]
+  materials: ChannelMaterialResponse[]
 }
 
 async function serverFetch<T>(path: string): Promise<T> {
@@ -111,7 +121,16 @@ export async function getEnrolledChannelAsClassDetail(id: string): Promise<Class
       endedAt: s.endedAt ?? '',
     }))
 
-    return { cls, recordings, materials: [] }
+    const materials: ClassMaterial[] = ch.materials.map((m) => ({
+      id: m.id,
+      title: m.title,
+      description: m.description,
+      fileUrl: m.fileUrl,
+      fileType: m.fileType,
+      createdAt: m.createdAt,
+    }))
+
+    return { cls, recordings, materials }
   } catch {
     return undefined
   }
