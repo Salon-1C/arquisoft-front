@@ -44,7 +44,7 @@ export function AppSidebar() {
     {
       label: 'Mis clases',
       icon: BookOpen,
-      href: '/mis-notas',
+      href: '/mis-clases',
       requiresAuth: true,
     },
     {

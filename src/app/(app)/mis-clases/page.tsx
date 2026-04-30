@@ -1,30 +1,32 @@
-import { getStreams } from '@/lib/api/streams'
 import { getEnrolledChannels } from '@/lib/api/channels'
-import ExplorarClient from '@/components/streaming/ExplorarClient'
+import MisClasesClient from '@/components/streaming/MisClasesClient'
 import type { Stream } from '@/types/stream'
 
 export const dynamic = 'force-dynamic'
 
-async function getEnrolledChannelIds(): Promise<string[]> {
-  try {
-    const channels = await getEnrolledChannels()
-    return channels.map((c) => c.id)
-  } catch {
-    return []
-  }
-}
-
-export default async function ExplorarPage() {
+export default async function MisClasesPage() {
   let streams: Stream[] = []
   let fetchError = false
 
   try {
-    const [response, enrolledIds] = await Promise.all([
-      getStreams({ status: 'live', type: 'public' }),
-      getEnrolledChannelIds(),
-    ])
-    const enrolledSet = new Set(enrolledIds)
-    streams = response.data.items.filter((s) => !enrolledSet.has(s.channelId))
+    const channels = await getEnrolledChannels()
+    streams = channels.flatMap((channel) =>
+      channel.streams
+        .filter((s) => s.status === 'live' || s.status === 'recorded')
+        .map((s) => ({
+          id: s.id,
+          channelId: channel.id,
+          title: s.title,
+          description: s.description,
+          instructorName: channel.instructorName,
+          instructorAvatarUrl: channel.instructorAvatarUrl,
+          status: s.status,
+          type: 'public' as const,
+          thumbnailUrl: s.thumbnailUrl,
+          startedAt: s.startedAt,
+          endedAt: s.endedAt,
+        }))
+    )
   } catch {
     fetchError = true
   }
@@ -35,7 +37,7 @@ export default async function ExplorarPage() {
         {fetchError ? (
           <div className="flex h-full items-center justify-center text-center px-8">
             <div>
-              <p className="text-base font-medium">No se pudo cargar las clases</p>
+              <p className="text-base font-medium">No se pudo cargar tus clases</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Intenta recargar la página.
               </p>
@@ -44,14 +46,14 @@ export default async function ExplorarPage() {
         ) : streams.length === 0 ? (
           <div className="flex h-full items-center justify-center text-center px-8">
             <div>
-              <p className="text-base font-medium">No hay clases en vivo</p>
+              <p className="text-base font-medium">No estás inscrito en ninguna clase</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Vuelve más tarde o únete con un código de acceso.
+                Explora clases públicas o únete con un código de acceso.
               </p>
             </div>
           </div>
         ) : (
-          <ExplorarClient streams={streams} />
+          <MisClasesClient streams={streams} />
         )}
       </div>
       <div className="hidden md:block w-(--sidebar-width) shrink-0 border-l border-border bg-muted" />

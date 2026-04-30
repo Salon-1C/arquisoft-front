@@ -44,7 +44,8 @@ async function serverFetch<T>(path: string): Promise<T> {
     throw new Error(message)
   }
 
-  return res.json() as Promise<T>
+  const wrapper = (await res.json()) as { data: T }
+  return wrapper.data
 }
 
 function toCourseStream(s: ChannelStreamResponse): CourseStream | null {

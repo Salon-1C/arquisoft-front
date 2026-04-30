@@ -21,7 +21,7 @@ interface StreamCardProps {
 export default function StreamCard({ stream }: StreamCardProps) {
   return (
     <Link
-      href={`/canal/${stream.channelId}`}
+      href={`/clase/${stream.id}`}
       className="flex cursor-pointer items-center gap-4 px-5 py-4 transition-shadow
         md:rounded-xl md:bg-background md:hover:shadow-sm"
     >

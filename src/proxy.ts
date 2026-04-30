@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const PROTECTED_ROUTES = ['/mis-notas', '/configuracion', '/onboarding']
+const PROTECTED_ROUTES = ['/mis-clases', '/mis-notas', '/configuracion', '/onboarding']
 const AUTH_ROUTES = ['/login', '/registro']
 
 function isAuthenticated(request: NextRequest): boolean {
