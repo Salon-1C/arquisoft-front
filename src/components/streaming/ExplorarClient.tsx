@@ -1,36 +1,36 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import type { Stream } from '@/types/stream'
-import StreamGrid from '@/components/streaming/StreamGrid'
-import { Button } from '@/components/ui/button'
+import type { Course } from '@/types/course'
+import Link from 'next/link'
+import { BookOpen, Search, SlidersHorizontal } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Search, SlidersHorizontal } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface ExplorarClientProps {
-  streams: Stream[]
+  courses: Course[]
 }
 
-export default function ExplorarClient({ streams }: ExplorarClientProps) {
+export default function ExplorarClient({ courses }: ExplorarClientProps) {
   const [query, setQuery] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [code, setCode] = useState('')
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return streams
-    return streams.filter(
-      (s) =>
-        s.title.toLowerCase().includes(q) ||
-        s.description.toLowerCase().includes(q) ||
-        s.instructorName.toLowerCase().includes(q)
+    if (!q) return courses
+    return courses.filter(
+      (c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.description.toLowerCase().includes(q) ||
+        c.instructorName.toLowerCase().includes(q)
     )
-  }, [streams, query])
+  }, [courses, query])
 
   return (
     <>
@@ -63,7 +63,42 @@ export default function ExplorarClient({ streams }: ExplorarClientProps) {
         )}
       </div>
 
-      <StreamGrid streams={filtered} />
+      <div className="flex flex-col gap-2 px-5 pb-8 md:px-20">
+        {filtered.map((course) => {
+          const isLive = course.streams.some((s) => s.status === 'live')
+          const recordedCount = course.streams.filter((s) => s.status === 'recorded').length
+
+          return (
+            <Link
+              key={course.id}
+              href={`/cursos/${course.id}`}
+              className="flex items-center gap-4 rounded-xl border border-border bg-background p-4 transition-shadow hover:shadow-sm"
+            >
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                {course.instructorName.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">{course.name}</span>
+                  {isLive && (
+                    <span className="flex items-center gap-1 rounded bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      <span className="relative flex size-1.5">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
+                        <span className="relative inline-flex size-1.5 rounded-full bg-white" />
+                      </span>
+                      EN VIVO
+                    </span>
+                  )}
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {course.instructorName} · {recordedCount} grabación{recordedCount !== 1 ? 'es' : ''}
+                </span>
+              </div>
+              <BookOpen className="size-5 shrink-0 text-muted-foreground" />
+            </Link>
+          )
+        })}
+      </div>
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-sm">

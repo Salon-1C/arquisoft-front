@@ -1,30 +1,15 @@
-import { getStreams } from '@/lib/api/streams'
-import { getEnrolledChannels } from '@/lib/api/channels'
+import { getPublicChannels } from '@/lib/api/channels'
 import ExplorarClient from '@/components/streaming/ExplorarClient'
-import type { Stream } from '@/types/stream'
+import type { Course } from '@/types/course'
 
 export const dynamic = 'force-dynamic'
 
-async function getEnrolledChannelIds(): Promise<string[]> {
-  try {
-    const channels = await getEnrolledChannels()
-    return channels.map((c) => c.id)
-  } catch {
-    return []
-  }
-}
-
 export default async function ExplorarPage() {
-  let streams: Stream[] = []
+  let courses: Course[] = []
   let fetchError = false
 
   try {
-    const [response, enrolledIds] = await Promise.all([
-      getStreams({ status: 'live', type: 'public' }),
-      getEnrolledChannelIds(),
-    ])
-    const enrolledSet = new Set(enrolledIds)
-    streams = response.data.items.filter((s) => !enrolledSet.has(s.channelId))
+    courses = await getPublicChannels()
   } catch {
     fetchError = true
   }
@@ -41,17 +26,17 @@ export default async function ExplorarPage() {
               </p>
             </div>
           </div>
-        ) : streams.length === 0 ? (
+        ) : courses.length === 0 ? (
           <div className="flex h-full items-center justify-center text-center px-8">
             <div>
-              <p className="text-base font-medium">No hay clases en vivo</p>
+              <p className="text-base font-medium">No hay clases disponibles</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Vuelve más tarde o únete con un código de acceso.
               </p>
             </div>
           </div>
         ) : (
-          <ExplorarClient streams={streams} />
+          <ExplorarClient courses={courses} />
         )}
       </div>
       <div className="hidden md:block w-(--sidebar-width) shrink-0 border-l border-border bg-muted" />

@@ -21,10 +21,10 @@ export default async function CoursePage({ params }: CoursePageProps) {
   if (!courseResult) notFound()
   const course = courseResult.data
 
-  const liveStream = course.streams.find((s) => s.status === 'live') ?? null
+  const featuredStream = course.streams[0] ?? null
 
   const recordings: ClassRecording[] = course.streams
-    .filter((s) => s.status === 'recorded')
+    .filter((s) => s.status === 'recorded' && (featuredStream?.status === 'live' || s.id !== featuredStream?.id))
     .map((s) => ({
       id: s.id,
       title: s.title,
@@ -40,9 +40,9 @@ export default async function CoursePage({ params }: CoursePageProps) {
 
         <div className="border-t border-border/60" />
 
-        {liveStream && (
+        {featuredStream && (
           <div className="pt-5">
-            <LiveStreamBanner stream={liveStream} />
+            <LiveStreamBanner stream={featuredStream} />
           </div>
         )}
 

@@ -27,7 +27,8 @@ interface ChannelResponse {
   name: string
   description: string
   instructorName: string
-  streams: ChannelStreamResponse[]
+  currentStream: ChannelStreamResponse | null
+  pastStreams: ChannelStreamResponse[]
   materials: ChannelMaterialResponse[]
 }
 
@@ -71,20 +72,31 @@ function toCourseStream(s: ChannelStreamResponse): CourseStream | null {
 }
 
 function toChannel(ch: ChannelResponse): Course {
+  const streams: CourseStream[] = []
+  if (ch.currentStream) {
+    const cs = toCourseStream(ch.currentStream)
+    if (cs) streams.push(cs)
+  }
+  for (const s of ch.pastStreams) {
+    const cs = toCourseStream(s)
+    if (cs) streams.push(cs)
+  }
   return {
     id: ch.id,
     name: ch.name,
     description: ch.description,
     instructorName: ch.instructorName,
-    streams: ch.streams.flatMap((s) => {
-      const cs = toCourseStream(s)
-      return cs ? [cs] : []
-    }),
+    streams,
   }
 }
 
 export async function getEnrolledChannels(): Promise<Course[]> {
   const channels = await serverFetch<ChannelResponse[]>('/api/cursos')
+  return channels.map(toChannel)
+}
+
+export async function getPublicChannels(): Promise<Course[]> {
+  const channels = await serverFetch<ChannelResponse[]>('/api/cursos/explorar')
   return channels.map(toChannel)
 }
 
@@ -101,8 +113,12 @@ export async function getEnrolledChannelAsClassDetail(id: string): Promise<Class
   try {
     const ch = await serverFetch<ChannelResponse>(`/api/cursos/${id}`)
 
-    const liveStream = ch.streams.find((s) => s.status === 'live')
-    const recordedStreams = ch.streams.filter((s) => s.status === 'recorded')
+    const allStreams = [
+      ...(ch.currentStream ? [ch.currentStream] : []),
+      ...ch.pastStreams,
+    ]
+    const liveStream = allStreams.find((s) => s.status === 'live')
+    const recordedStreams = allStreams.filter((s) => s.status === 'recorded')
 
     const cls: Class = {
       id: ch.id,

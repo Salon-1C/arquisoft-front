@@ -1,32 +1,15 @@
 import { getEnrolledChannels } from '@/lib/api/channels'
 import MisClasesClient from '@/components/streaming/MisClasesClient'
-import type { Stream } from '@/types/stream'
+import type { Course } from '@/types/course'
 
 export const dynamic = 'force-dynamic'
 
 export default async function MisClasesPage() {
-  let streams: Stream[] = []
+  let courses: Course[] = []
   let fetchError = false
 
   try {
-    const channels = await getEnrolledChannels()
-    streams = channels.flatMap((channel) =>
-      channel.streams
-        .filter((s) => s.status === 'live' || s.status === 'recorded')
-        .map((s) => ({
-          id: s.id,
-          channelId: channel.id,
-          title: s.title,
-          description: s.description,
-          instructorName: channel.instructorName,
-          instructorAvatarUrl: channel.instructorAvatarUrl,
-          status: s.status,
-          type: 'public' as const,
-          thumbnailUrl: s.thumbnailUrl,
-          startedAt: s.startedAt,
-          endedAt: s.endedAt,
-        }))
-    )
+    courses = await getEnrolledChannels()
   } catch {
     fetchError = true
   }
@@ -43,7 +26,7 @@ export default async function MisClasesPage() {
               </p>
             </div>
           </div>
-        ) : streams.length === 0 ? (
+        ) : courses.length === 0 ? (
           <div className="flex h-full items-center justify-center text-center px-8">
             <div>
               <p className="text-base font-medium">No estás inscrito en ninguna clase</p>
@@ -53,7 +36,7 @@ export default async function MisClasesPage() {
             </div>
           </div>
         ) : (
-          <MisClasesClient streams={streams} />
+          <MisClasesClient courses={courses} />
         )}
       </div>
       <div className="hidden md:block w-(--sidebar-width) shrink-0 border-l border-border bg-muted" />
