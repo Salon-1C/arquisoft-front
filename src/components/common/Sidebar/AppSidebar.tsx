@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { BookOpen, ChevronUp, Compass, DoorOpen, LogOut, Radio, Settings, Sparkles, UserRound, GraduationCap } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { useModal } from '@/hooks/useModal'
 import { useViewMode } from '@/context/ViewModeContext'
@@ -36,6 +36,7 @@ interface NavItem {
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const { isAuthenticated, user, logout } = useAuth()
   const { openAuthModal } = useModal()
   const { viewMode, isProfesor, setViewMode } = useViewMode()
@@ -189,7 +190,7 @@ export function AppSidebar() {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer" onClick={logout}>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => { logout(); router.push('/') }}>
                     <LogOut className="size-4" />
                     <span>Cerrar sesión</span>
                   </DropdownMenuItem>

@@ -6,6 +6,10 @@ import { getMe, logout as apiLogout } from '@/lib/api/auth'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
+async function clearSessionCookie(): Promise<void> {
+  await fetch('/api/auth/clear-session', { method: 'POST' })
+}
+
 interface AuthProviderProps {
   children: React.ReactNode
 }
@@ -14,10 +18,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Restore session from the blume_session cookie on mount.
   useEffect(() => {
     getMe()
-      .then(setUser)
+      .then((u) => {
+        if (u) {
+          setUser(u)
+        } else {
+          // No valid session — clear any stale cookie so proxy.ts stops blocking /login
+          clearSessionCookie().catch(() => {})
+        }
+      })
       .finally(() => setIsLoading(false))
   }, [])
 
@@ -27,6 +37,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = () => {
     apiLogout().catch(() => {})
+    clearSessionCookie().catch(() => {})
     setUser(null)
   }
 
