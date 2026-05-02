@@ -9,14 +9,16 @@ interface ClassRecordingsSectionProps {
 export default function ClassRecordingsSection({ recordings }: ClassRecordingsSectionProps) {
   return (
     <section>
-      <h2 className="mb-4 text-lg font-semibold">Transmisiones guardadas</h2>
+      <h2 className="mb-2 px-5 text-xs font-semibold uppercase tracking-wider text-muted-foreground md:px-8">
+        Clases anteriores
+      </h2>
       {recordings.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-border py-10 text-muted-foreground">
+        <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground">
           <VideoOff className="size-8 opacity-30" />
           <p className="text-sm">No hay transmisiones guardadas</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+        <div className="flex flex-col divide-y divide-border/60">
           {recordings.map((recording) => (
             <ClassRecordingCard key={recording.id} recording={recording} />
           ))}

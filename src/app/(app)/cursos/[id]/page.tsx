@@ -1,9 +1,9 @@
 import { getCourseById } from '@/lib/api/courses'
 import { getEnrolledChannelAsClassDetail } from '@/lib/api/channels'
 import type { ClassRecording } from '@/types/class'
-import CourseHeader from '@/components/courses/CourseHeader'
-import LiveStreamBanner from '@/components/courses/LiveStreamBanner'
-import ChannelTabs from '@/components/channels/ChannelTabs'
+import CourseHeader from '@/components/cursos/CourseHeader'
+import LiveStreamBanner from '@/components/cursos/LiveStreamBanner'
+import ChannelTabs from '@/components/cursos/ChannelTabs'
 import { notFound } from 'next/navigation'
 
 interface CoursePageProps {

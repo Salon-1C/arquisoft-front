@@ -1,13 +1,13 @@
 import type { ClassRecording } from '@/types/class'
 import { Clock, Play } from 'lucide-react'
-import Image from 'next/image'
+import Link from 'next/link'
 
 interface ClassRecordingCardProps {
   recording: ClassRecording
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('es-ES', {
+  return new Date(dateStr).toLocaleDateString('es-CO', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -18,6 +18,7 @@ function formatDuration(startedAt: string, endedAt: string): string {
   const diffMin = Math.round(
     (new Date(endedAt).getTime() - new Date(startedAt).getTime()) / 60000
   )
+  if (diffMin < 1) return ''
   if (diffMin < 60) return `${diffMin} min`
   const h = Math.floor(diffMin / 60)
   const m = diffMin % 60
@@ -25,36 +26,39 @@ function formatDuration(startedAt: string, endedAt: string): string {
 }
 
 export default function ClassRecordingCard({ recording }: ClassRecordingCardProps) {
-  return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-background">
-      <div className="relative aspect-video w-full bg-muted">
-        {recording.thumbnailUrl ? (
-          <Image
-            src={recording.thumbnailUrl}
-            alt={recording.title}
-            fill
-            className="object-cover"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            <Play className="size-8 text-muted-foreground/30" />
-          </div>
-        )}
-      </div>
+  const duration = recording.endedAt ? formatDuration(recording.startedAt, recording.endedAt) : ''
 
-      <div className="flex flex-1 flex-col gap-1 p-3">
-        <h3 className="line-clamp-2 text-sm font-medium leading-snug">{recording.title}</h3>
-        {recording.description && (
-          <p className="line-clamp-2 text-xs text-muted-foreground">{recording.description}</p>
-        )}
-        <div className="mt-auto flex items-center gap-3 pt-2 text-xs text-muted-foreground">
-          <span>{formatDate(recording.startedAt)}</span>
-          <div className="flex items-center gap-1">
-            <Clock className="size-3" />
-            <span>{formatDuration(recording.startedAt, recording.endedAt)}</span>
-          </div>
+  return (
+    <Link
+      href={`/clase/${recording.id}`}
+      className="group flex gap-4 px-5 py-4 transition-colors hover:bg-muted/60 md:px-8"
+    >
+      <div className="relative h-[90px] w-40 shrink-0 overflow-hidden rounded-lg bg-muted">
+        <div className="flex h-full w-full items-center justify-center">
+          <Play className="size-7 text-muted-foreground/40 transition-colors group-hover:text-muted-foreground/60" />
         </div>
       </div>
-    </div>
+
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
+        <h3 className="font-semibold leading-snug">{recording.title}</h3>
+
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          {duration && (
+            <>
+              <span className="flex items-center gap-1">
+                <Clock className="size-3" />
+                {duration}
+              </span>
+              <span>·</span>
+            </>
+          )}
+          <span>{formatDate(recording.startedAt)}</span>
+        </div>
+
+        {recording.description && (
+          <p className="line-clamp-2 text-sm text-muted-foreground">{recording.description}</p>
+        )}
+      </div>
+    </Link>
   )
 }

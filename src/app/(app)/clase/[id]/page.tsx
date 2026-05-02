@@ -2,7 +2,8 @@ import { cookies } from 'next/headers'
 import type { Stream } from '@/types/stream'
 import { getEnrolledChannelAsClassDetail } from '@/lib/api/channels'
 import LiveView from './LiveView'
-import ChannelTabs from '@/components/channels/ChannelTabs'
+import ChannelTabs from '@/components/cursos/ChannelTabs'
+import ClassHeader from '@/components/classes/ClassHeader'
 
 export const dynamic = 'force-dynamic'
 
@@ -52,10 +53,13 @@ export default async function ClasePage({
   return (
     <div className="h-full overflow-y-auto">
       <main className="mx-auto max-w-4xl px-4 py-8 flex flex-col gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">{stream.title}</h1>
-          <p className="mt-0.5 text-xs text-muted-foreground">Por {stream.instructorName}</p>
-        </div>
+        <ClassHeader
+          title={stream.title}
+          description={stream.description}
+          instructorName={stream.instructorName}
+          thumbnailUrl={stream.thumbnailUrl}
+          isLive={stream.status === 'live'}
+        />
         <LiveView
           classId={id}
           streamPath={streamPath}
