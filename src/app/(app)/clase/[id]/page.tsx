@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
-async function fetchStream(id: string): Promise<Stream | undefined> {
+async function fetchStream(id: string): Promise<Stream | 'server_error' | undefined> {
   try {
     const cookieStore = await cookies()
     const session = cookieStore.get('blume_session')?.value
@@ -22,12 +22,12 @@ async function fetchStream(id: string): Promise<Stream | undefined> {
       cache: 'no-store',
     })
 
-    if (!res.ok) return undefined
+    if (!res.ok) return res.status >= 500 ? 'server_error' : undefined
 
     const wrapper = (await res.json()) as { data: Stream }
     return wrapper.data
   } catch {
-    return undefined
+    return 'server_error'
   }
 }
 
@@ -43,6 +43,14 @@ export default async function ClasePage({
     return (
       <main className="mx-auto max-w-4xl px-4 py-8">
         <p className="text-muted-foreground text-sm">Clase no encontrada o no disponible.</p>
+      </main>
+    )
+  }
+
+  if (stream === 'server_error') {
+    return (
+      <main className="mx-auto max-w-4xl px-4 py-8">
+        <p className="text-muted-foreground text-sm">No se pudo cargar la clase. Intenta de nuevo más tarde.</p>
       </main>
     )
   }
