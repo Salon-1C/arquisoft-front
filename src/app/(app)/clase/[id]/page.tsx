@@ -7,7 +7,7 @@ import ClassHeader from '@/components/classes/ClassHeader'
 
 export const dynamic = 'force-dynamic'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
+const API_BASE = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL
 
 async function fetchStream(id: string): Promise<Stream | 'server_error' | undefined> {
   try {

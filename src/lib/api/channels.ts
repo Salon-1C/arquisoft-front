@@ -2,7 +2,7 @@ import { cookies } from 'next/headers'
 import type { Course, CourseStream } from '@/types/course'
 import type { Class, ClassDetail, ClassMaterial, ClassRecording } from '@/types/class'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
+const API_BASE = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL
 
 interface ChannelStreamResponse {
   id: string
