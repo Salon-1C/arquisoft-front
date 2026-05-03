@@ -109,44 +109,65 @@ export async function getEnrolledChannelAsCourse(id: string): Promise<Course | u
   }
 }
 
+export async function getPublicChannelById(id: string): Promise<Course | undefined> {
+  try {
+    const ch = await serverFetch<ChannelResponse>(`/api/cursos/explorar/${id}`)
+    return toChannel(ch)
+  } catch {
+    return undefined
+  }
+}
+
+export async function getPublicChannelAsClassDetail(id: string): Promise<ClassDetail | undefined> {
+  try {
+    const ch = await serverFetch<ChannelResponse>(`/api/cursos/explorar/${id}`)
+    return channelToClassDetail(ch)
+  } catch {
+    return undefined
+  }
+}
+
+function channelToClassDetail(ch: ChannelResponse): ClassDetail {
+  const allStreams = [
+    ...(ch.currentStream ? [ch.currentStream] : []),
+    ...ch.pastStreams,
+  ]
+  const liveStream = allStreams.find((s) => s.status === 'live')
+  const recordedStreams = allStreams.filter((s) => s.status === 'recorded')
+
+  const cls: Class = {
+    id: ch.id,
+    name: ch.name,
+    description: ch.description,
+    instructorName: ch.instructorName,
+    isLive: !!liveStream,
+    liveStreamId: liveStream?.id,
+  }
+
+  const recordings: ClassRecording[] = recordedStreams.map((s) => ({
+    id: s.id,
+    title: s.title,
+    description: s.description,
+    startedAt: s.startedAt ?? '',
+    endedAt: s.endedAt ?? '',
+  }))
+
+  const materials: ClassMaterial[] = ch.materials.map((m) => ({
+    id: m.id,
+    title: m.title,
+    description: m.description,
+    fileUrl: m.fileUrl,
+    fileType: m.fileType,
+    createdAt: m.createdAt,
+  }))
+
+  return { cls, recordings, materials }
+}
+
 export async function getEnrolledChannelAsClassDetail(id: string): Promise<ClassDetail | undefined> {
   try {
     const ch = await serverFetch<ChannelResponse>(`/api/cursos/${id}`)
-
-    const allStreams = [
-      ...(ch.currentStream ? [ch.currentStream] : []),
-      ...ch.pastStreams,
-    ]
-    const liveStream = allStreams.find((s) => s.status === 'live')
-    const recordedStreams = allStreams.filter((s) => s.status === 'recorded')
-
-    const cls: Class = {
-      id: ch.id,
-      name: ch.name,
-      description: ch.description,
-      instructorName: ch.instructorName,
-      isLive: !!liveStream,
-      liveStreamId: liveStream?.id,
-    }
-
-    const recordings: ClassRecording[] = recordedStreams.map((s) => ({
-      id: s.id,
-      title: s.title,
-      description: s.description,
-      startedAt: s.startedAt ?? '',
-      endedAt: s.endedAt ?? '',
-    }))
-
-    const materials: ClassMaterial[] = ch.materials.map((m) => ({
-      id: m.id,
-      title: m.title,
-      description: m.description,
-      fileUrl: m.fileUrl,
-      fileType: m.fileType,
-      createdAt: m.createdAt,
-    }))
-
-    return { cls, recordings, materials }
+    return channelToClassDetail(ch)
   } catch {
     return undefined
   }

@@ -1,6 +1,6 @@
-import { getCourseById } from '@/lib/api/courses'
-import { getEnrolledChannelAsClassDetail } from '@/lib/api/channels'
+import { getEnrolledChannelAsCourse, getEnrolledChannelAsClassDetail, getPublicChannelById, getPublicChannelAsClassDetail } from '@/lib/api/channels'
 import type { ClassRecording } from '@/types/class'
+import type { Course } from '@/types/course'
 import CourseHeader from '@/components/cursos/CourseHeader'
 import LiveStreamBanner from '@/components/cursos/LiveStreamBanner'
 import ChannelTabs from '@/components/cursos/ChannelTabs'
@@ -13,13 +13,18 @@ interface CoursePageProps {
 export default async function CoursePage({ params }: CoursePageProps) {
   const { id } = await params
 
-  const [courseResult, classDetail] = await Promise.all([
-    getCourseById(id).catch(() => null),
-    getEnrolledChannelAsClassDetail(id),
-  ])
+  let course: Course | undefined = await getEnrolledChannelAsCourse(id)
+  let enrolled = true
 
-  if (!courseResult) notFound()
-  const course = courseResult.data
+  if (!course) {
+    course = await getPublicChannelById(id)
+    if (!course) notFound()
+    enrolled = false
+  }
+
+  const classDetail = enrolled
+    ? await getEnrolledChannelAsClassDetail(id)
+    : await getPublicChannelAsClassDetail(id)
 
   const featuredStream = course.streams[0] ?? null
 
@@ -36,7 +41,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   return (
     <div className="flex h-full">
       <div className="flex-1 overflow-y-auto">
-        <CourseHeader course={course} />
+        <CourseHeader course={course} enrolled={enrolled} />
 
         <div className="border-t border-border/60" />
 
