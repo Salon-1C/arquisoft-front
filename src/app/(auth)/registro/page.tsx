@@ -42,7 +42,7 @@ function RegistroForm() {
       if (err instanceof ApiError && err.status === 409) {
         setError('Ya existe una cuenta con ese correo')
       } else if (err instanceof ApiError && err.status === 400) {
-        setError('La contraseña debe tener al menos 8 caracteres')
+        setError(err.message)
       } else {
         setError('No se pudo crear la cuenta. Intenta de nuevo.')
       }
