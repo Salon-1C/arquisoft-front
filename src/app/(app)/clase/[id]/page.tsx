@@ -4,16 +4,14 @@ import { getEnrolledChannelAsClassDetail } from '@/lib/api/channels'
 import LiveView from './LiveView'
 import ChannelTabs from '@/components/cursos/ChannelTabs'
 import ClassHeader from '@/components/classes/ClassHeader'
+import ChatView from "@/components/player/ChatView";
 
 export const dynamic = 'force-dynamic'
 
 const API_BASE = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL
 
-async function fetchStream(id: string): Promise<Stream | 'server_error' | undefined> {
+async function fetchStream(id: string, session: string | undefined): Promise<Stream | 'server_error' | undefined> {
   try {
-    const cookieStore = await cookies()
-    const session = cookieStore.get('blume_session')?.value
-
     const res = await fetch(`${API_BASE}/api/clases/${id}`, {
       headers: {
         'Content-Type': 'application/json',
@@ -37,7 +35,9 @@ export default async function ClasePage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const stream = await fetchStream(id)
+  const cookieStore = await cookies()
+  const session = cookieStore.get('blume_session')?.value
+  const stream = await fetchStream(id, session)
 
   if (!stream) {
     return (
@@ -59,8 +59,8 @@ export default async function ClasePage({
   const streamPath = `/live/${stream.id}`
 
   return (
-    <div className="h-full overflow-y-auto">
-      <main className="mx-auto max-w-4xl px-4 py-8 flex flex-col gap-4">
+    <div className="flex h-full overflow-hidden">
+      <main className="flex-1 overflow-y-auto px-4 py-8 flex flex-col gap-4">
         <ClassHeader
           title={stream.title}
           description={stream.description}
@@ -80,6 +80,12 @@ export default async function ClasePage({
           materials={channelDetail?.materials ?? []}
         />
       </main>
+      <aside className="w-100 shrink-0 border-l border-[var(--color-border)] overflow-y-auto">
+        <ChatView
+          classId={id}
+          token={session}
+        />
+      </aside>
     </div>
   )
 }
