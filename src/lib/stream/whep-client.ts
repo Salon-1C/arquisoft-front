@@ -2,20 +2,22 @@ export interface WhepOptions {
   streamUrl: string
   path: string
   videoEl: HTMLVideoElement
+  token?: string
 }
 
 export interface WhepSession {
   stop: () => Promise<void>
 }
 
-export async function startWhep({ streamUrl, path, videoEl }: WhepOptions): Promise<WhepSession> {
+export async function startWhep({ streamUrl, path, videoEl, token }: WhepOptions): Promise<WhepSession> {
   // Register as a viewer before negotiating so the counter is accurate.
   await fetch(`${streamUrl}/api/viewers/connect`, { method: 'POST' })
 
   let sessionURL: string | null = null
 
+  const tokenParam = token ? `&token=${encodeURIComponent(token)}` : ''
   const sessionRes = await fetch(
-    `${streamUrl}/api/viewer-session?path=${encodeURIComponent(path)}`
+    `${streamUrl}/api/viewer-session?path=${encodeURIComponent(path)}${tokenParam}`
   )
   if (!sessionRes.ok) {
     await fetch(`${streamUrl}/api/viewers/disconnect`, { method: 'POST' })

@@ -17,6 +17,7 @@ export interface Session {
 
 export interface AuthContextType {
   user: User | null
+  token: string
   isAuthenticated: boolean
   isLoading: boolean
   login: (session: Session) => void

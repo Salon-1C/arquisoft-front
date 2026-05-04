@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { startWhep } from '@/lib/stream/whep-client'
+import { useAuth } from '@/hooks/useAuth'
 
 interface VideoPlayerProps {
   streamPath: string
@@ -13,6 +14,7 @@ export default function VideoPlayer({ streamPath }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [state, setState] = useState<PlayerState>('idle')
   const [error, setError] = useState<string | null>(null)
+  const { token } = useAuth()
 
   useEffect(() => {
     const streamUrl = process.env.NEXT_PUBLIC_STREAM_URL
@@ -24,7 +26,7 @@ export default function VideoPlayer({ streamPath }: VideoPlayerProps) {
     setState('connecting')
     setError(null)
 
-    startWhep({ streamUrl, path: streamPath, videoEl: videoRef.current })
+    startWhep({ streamUrl, path: streamPath, videoEl: videoRef.current, token: token || undefined })
       .then((s) => {
         if (cancelled) {
           void s.stop()

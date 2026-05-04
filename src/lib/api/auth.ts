@@ -9,6 +9,7 @@ interface UserResponse {
   role: string
   avatarUrl: string | null
   onboardingComplete: boolean
+  token?: string  // JWT returned by login/registro/firebase (null on /me)
 }
 
 function toUser(u: UserResponse): User {
@@ -30,7 +31,7 @@ export async function login(email: string, password: string): Promise<Session> {
   })
   // The JWT is stored in the blume_session cookie by the server.
   // We only need the user profile client-side.
-  return { user: toUser(res.data), token: '' }
+  return { user: toUser(res.data), token: res.data.token || '' }
 }
 
 export async function signup(
@@ -42,7 +43,7 @@ export async function signup(
     method: 'POST',
     body: JSON.stringify({ email, password, fullName: fullName ?? '' }),
   })
-  return { user: toUser(res.data), token: '' }
+  return { user: toUser(res.data), token: res.data.token || '' }
 }
 
 export async function logout(): Promise<void> {
@@ -54,7 +55,7 @@ export async function firebaseLogin(idToken: string): Promise<Session> {
     method: 'POST',
     body: JSON.stringify({ idToken }),
   })
-  return { user: toUser(res.data), token: '' }
+  return { user: toUser(res.data), token: res.data.token || '' }
 }
 
 export async function getMe(): Promise<User | null> {
@@ -74,5 +75,5 @@ export async function completeOnboarding(
     method: 'POST',
     body: JSON.stringify({ username, roleCode }),
   })
-  return { user: toUser(res.data), token: '' }
+  return { user: toUser(res.data), token: res.data.token || '' }
 }
