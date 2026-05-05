@@ -9,7 +9,8 @@ interface ChatViewProps {
 }
 
 function formatTime(sentAt: string): string {
-    return new Date(sentAt).toLocaleTimeString("es", { hour: "numeric", minute: "2-digit", hour12: true })
+    const normalized = /Z|[+-]\d{2}:\d{2}$/.test(sentAt) ? sentAt : sentAt + "Z"
+    return new Date(normalized).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit", hour12: true })
 }
 
 export default function ChatView({ classId, token} : ChatViewProps) {

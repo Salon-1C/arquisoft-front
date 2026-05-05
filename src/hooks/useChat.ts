@@ -15,9 +15,9 @@ export function useChat(classId: string, token: string | undefined) {
         socket.connect()
 
         const channel = socket.channel(`stream:${classId}`, {})
-        channel.join().receive("ok", (response: { messages?: { username: string; body: string; sent_at: string }[] }) => {
+        channel.join().receive("ok", (response: { messages?: { username: string; message: string; sent_at: string }[] }) => {
             if (response.messages) {
-                setMessages(response.messages.map((m) => ({ username: m.username, body: m.body, sentAt: m.sent_at })))
+                setMessages(response.messages.map((m) => ({ username: m.username, body: m.message, sentAt: m.sent_at })))
             }
         })
         channel.on("new_message", (payload: { username: string; message: string; sent_at: string }) => {
