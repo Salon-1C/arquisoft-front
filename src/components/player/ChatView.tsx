@@ -8,6 +8,10 @@ interface ChatViewProps {
     token: string | undefined
 }
 
+function formatTime(sentAt: string): string {
+    return new Date(sentAt).toLocaleTimeString("es", { hour: "numeric", minute: "2-digit", hour12: true })
+}
+
 export default function ChatView({ classId, token} : ChatViewProps) {
     const { messages, sendMessage } = useChat(classId, token)
     const [input, setInput] = useState("")
@@ -20,11 +24,16 @@ export default function ChatView({ classId, token} : ChatViewProps) {
 
     return (
         <div className="flex flex-col h-full p-4 gap-4">
-            <p className="text-sm font-semibold text-[var(--color-text)]">Chat en Vivo</p>
+            <p className="text-sm font-bold">Chat en Vivo</p>
             <div className="flex-1 overflow-y-auto flex flex-col gap-2">
                 {messages.map((msg, i) => (
                     <div key={i} className="rounded-md bg-[var(--color-background)] border border-[var(--color-border)] px-3 py-2 text-sm text-[var(--color-text)]">
-                        {msg}
+                        <div className="flex items-baseline justify-between gap-2">
+                            <span className="flex-1 min-w-0">
+                                <span className="text-primary">{msg.username}:</span> {msg.body}
+                            </span>
+                            <span className="shrink-0 text-xs text-[var(--color-text-muted)]">{formatTime(msg.sentAt)}</span>
+                        </div>
                     </div>
                 ))}
             </div>
