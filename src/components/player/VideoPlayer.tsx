@@ -8,12 +8,11 @@ interface VideoPlayerProps {
   streamPath: string
 }
 
-type PlayerState = 'idle' | 'connecting' | 'playing' | 'error'
+type PlayerState = 'idle' | 'connecting' | 'playing' | 'waiting'
 
 export default function VideoPlayer({ streamPath }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [state, setState] = useState<PlayerState>('idle')
-  const [error, setError] = useState<string | null>(null)
   const { token } = useAuth()
 
   useEffect(() => {
@@ -24,7 +23,6 @@ export default function VideoPlayer({ streamPath }: VideoPlayerProps) {
     let cancelled = false
 
     setState('connecting')
-    setError(null)
 
     startWhep({ streamUrl, path: streamPath, videoEl: videoRef.current, token: token || undefined })
       .then((s) => {
@@ -35,10 +33,9 @@ export default function VideoPlayer({ streamPath }: VideoPlayerProps) {
         session = s
         setState('playing')
       })
-      .catch((err: Error) => {
-        if (cancelled) return
-        setError(err.message)
-        setState('error')
+      .catch(() => {
+        // WHEP failure = professor hasn't opened OBS yet. Not a fatal error.
+        if (!cancelled) setState('waiting')
       })
 
     return () => {
@@ -62,10 +59,14 @@ export default function VideoPlayer({ streamPath }: VideoPlayerProps) {
           <span className="text-white text-sm">Conectando al stream...</span>
         </div>
       )}
-      {state === 'error' && (
+      {state === 'waiting' && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 gap-2">
-          <span className="text-red-400 text-sm font-medium">Error al conectar</span>
-          {error && <span className="text-white/60 text-xs">{error}</span>}
+          <span className="text-white/80 text-sm font-medium">
+            Esperando a que el profesor inicie la transmisión...
+          </span>
+          <span className="text-white/40 text-xs">
+            El video aparecerá aquí automáticamente
+          </span>
         </div>
       )}
     </div>
