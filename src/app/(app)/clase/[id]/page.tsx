@@ -83,7 +83,6 @@ export default async function ClasePage({
       <aside className="w-100 shrink-0 border-l border-[var(--color-border)] overflow-y-auto">
         <ChatView
           classId={id}
-          token={session}
         />
       </aside>
     </div>

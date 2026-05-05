@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import {useChat} from "@/hooks/useChat";
+import { useChat } from "@/hooks/useChat";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ChatViewProps {
     classId: string
-    token: string | undefined
 }
 
 function formatTime(sentAt: string): string {
@@ -13,8 +13,9 @@ function formatTime(sentAt: string): string {
     return new Date(normalized).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit", hour12: true })
 }
 
-export default function ChatView({ classId, token} : ChatViewProps) {
-    const { messages, sendMessage } = useChat(classId, token)
+export default function ChatView({ classId }: ChatViewProps) {
+    const { token } = useAuth()
+    const { messages, sendMessage } = useChat(classId, token || undefined)
     const [input, setInput] = useState("")
 
     function handleSend() {
