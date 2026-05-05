@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import type { Course } from '@/types/course'
+import type { RecommendedStream } from '@/lib/api/recommendations'
 import Link from 'next/link'
 import { BookOpen, Search, SlidersHorizontal } from 'lucide-react'
 import {
@@ -11,12 +12,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import StreamCard from '@/components/streaming/StreamCard'
 
 interface ExplorarClientProps {
   courses: Course[]
+  recommendations: RecommendedStream[]
 }
 
-export default function ExplorarClient({ courses }: ExplorarClientProps) {
+export default function ExplorarClient({ courses, recommendations }: ExplorarClientProps) {
   const [query, setQuery] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [code, setCode] = useState('')
@@ -62,6 +65,19 @@ export default function ExplorarClient({ courses }: ExplorarClientProps) {
           </Button>
         )}
       </div>
+
+      {recommendations.length > 0 && (
+        <div className="px-5 pb-6 md:px-20">
+          <h2 className="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+            Recomendado para ti
+          </h2>
+          <div className="flex flex-col gap-1 rounded-xl border border-border bg-background overflow-hidden">
+            {recommendations.map((stream) => (
+              <StreamCard key={stream.id} stream={stream} />
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col gap-2 px-5 pb-8 md:px-20">
         {filtered.map((course) => {
