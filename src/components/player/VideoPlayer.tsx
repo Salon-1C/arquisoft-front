@@ -13,36 +13,65 @@ type PlayerState = 'idle' | 'connecting' | 'playing' | 'waiting'
 export default function VideoPlayer({ streamPath }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [state, setState] = useState<PlayerState>('idle')
-  const { token } = useAuth()
+  const { token, isLoading } = useAuth()
+
+  // Disconnect any existing viewer session
+  const disconnectExistingSession = async () => {
+    const streamUrl = process.env.NEXT_PUBLIC_STREAM_URL
+    if (!streamUrl) return
+
+    try {
+      await fetch(`${streamUrl}/api/viewers/disconnect`, { method: 'POST' })
+    } catch {
+      // Ignore disconnect errors
+    }
+  }
 
   useEffect(() => {
     const streamUrl = process.env.NEXT_PUBLIC_STREAM_URL
-    if (!streamUrl || !streamPath || !videoRef.current) return
+    if (!streamUrl || !streamPath || !videoRef.current || isLoading) return
 
     let session: Awaited<ReturnType<typeof startWhep>> | null = null
     let cancelled = false
 
-    setState('connecting')
+    const initializeStream = async () => {
+      // Disconnect any existing session first
+      await disconnectExistingSession()
 
-    startWhep({ streamUrl, path: streamPath, videoEl: videoRef.current, token: token || undefined })
-      .then((s) => {
-        if (cancelled) {
-          void s.stop()
-          return
+      setState('connecting')
+
+      try {
+        session = await startWhep({ streamUrl, path: streamPath, videoEl: videoRef.current!, token: token || undefined })
+        if (!cancelled) {
+          setState('playing')
         }
-        session = s
-        setState('playing')
-      })
-      .catch(() => {
+      } catch {
         // WHEP failure = professor hasn't opened OBS yet. Not a fatal error.
         if (!cancelled) setState('waiting')
-      })
+      }
+    }
+
+    void initializeStream()
 
     return () => {
       cancelled = true
       void session?.stop()
     }
-  }, [streamPath])
+  }, [streamPath, token, isLoading])
+
+  // Handle page unload to disconnect
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const streamUrl = process.env.NEXT_PUBLIC_STREAM_URL
+      if (streamUrl) {
+        // Use sendBeacon for reliable delivery during page unload
+        navigator.sendBeacon(`${streamUrl}/api/viewers/disconnect`)
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [])
 
   return (
     <div className="relative w-full overflow-hidden rounded-xl bg-black aspect-video">
