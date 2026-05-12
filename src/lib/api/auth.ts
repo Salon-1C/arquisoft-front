@@ -1,65 +1,79 @@
-import type { Session, User } from '@/types/auth'
-import type { ApiResponse } from '@/types/api'
+import { apiFetch } from './client'
+import type { Session, User, UserRole } from '@/types/auth'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
-
-async function handleResponse<T>(res: Response): Promise<T> {
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}))
-    throw new Error(body.message ?? `HTTP ${res.status}`)
-  }
-  return res.json() as Promise<T>
+interface UserResponse {
+  id: string
+  email: string
+  name: string
+  username: string | null
+  role: string
+  avatarUrl: string | null
+  onboardingComplete: boolean
+  token?: string  // JWT returned by login/registro/firebase (null on /me)
 }
 
-function toSession(user: User): Session {
-  return { user, token: '' }
+function toUser(u: UserResponse): User {
+  return {
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    username: u.username ?? undefined,
+    role: u.role as UserRole,
+    avatarUrl: u.avatarUrl ?? undefined,
+    onboardingComplete: u.onboardingComplete,
+  }
 }
 
 export async function login(email: string, password: string): Promise<Session> {
-  const res = await fetch(`${API_URL}/api/auth/login`, {
+  const res = await apiFetch<UserResponse>('/api/auth/login', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify({ email, password }),
   })
-  const { data } = await handleResponse<ApiResponse<User>>(res)
-  return toSession(data)
+  // The JWT is stored in the blume_session cookie by the server.
+  // We only need the user profile client-side.
+  return { user: toUser(res.data), token: res.data.token || '' }
 }
 
-export async function signup(email: string, password: string): Promise<Session> {
-  const res = await fetch(`${API_URL}/api/auth/registro`, {
+export async function signup(
+  email: string,
+  password: string,
+  fullName?: string
+): Promise<Session> {
+  const res = await apiFetch<UserResponse>('/api/auth/registro', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, fullName: fullName ?? '' }),
   })
-  const { data } = await handleResponse<ApiResponse<User>>(res)
-  return toSession(data)
+  return { user: toUser(res.data), token: res.data.token || '' }
 }
 
 export async function logout(): Promise<void> {
-  await fetch(`${API_URL}/api/auth/logout`, {
-    method: 'POST',
-    credentials: 'include',
-  })
+  await apiFetch<null>('/api/auth/logout', { method: 'POST' })
 }
 
 export async function firebaseLogin(idToken: string): Promise<Session> {
-  const res = await fetch(`${API_URL}/api/auth/firebase/login`, {
+  const res = await apiFetch<UserResponse>('/api/auth/firebase/login', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
     body: JSON.stringify({ idToken }),
   })
-  const { data } = await handleResponse<ApiResponse<User>>(res)
-  return toSession(data)
+  return { user: toUser(res.data), token: res.data.token || '' }
 }
 
 export async function getMe(): Promise<User | null> {
-  const res = await fetch(`${API_URL}/api/auth/me`, {
-    credentials: 'include',
+  try {
+    const res = await apiFetch<UserResponse>('/api/auth/me')
+    return toUser(res.data)
+  } catch {
+    return null
+  }
+}
+
+export async function completeOnboarding(
+  username: string,
+  roleCode: 'STUDENT' | 'PROFESSOR'
+): Promise<Session> {
+  const res = await apiFetch<UserResponse>('/api/auth/onboarding', {
+    method: 'POST',
+    body: JSON.stringify({ username, roleCode }),
   })
-  if (res.status === 401) return null
-  const { data } = await handleResponse<ApiResponse<User>>(res)
-  return data
+  return { user: toUser(res.data), token: res.data.token || '' }
 }

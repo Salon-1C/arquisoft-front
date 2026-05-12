@@ -17,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ChevronUp, Compass, History, LogIn, LogOut, NotebookPen, Radio, Settings, UserRound, GraduationCap } from 'lucide-react'
+import { BookOpen, ChevronUp, Compass, DoorOpen, LogOut, Radio, Settings, Sparkles, UserRound, GraduationCap } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
@@ -38,15 +38,16 @@ export function AppSidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const { isAuthenticated, user, logout } = useAuth()
-
-  function handleLogout() {
-    logout()
-    router.replace('/')
-  }
   const { openAuthModal } = useModal()
   const { viewMode, isProfesor, setViewMode } = useViewMode()
 
   const navItems: NavItem[] = [
+    {
+      label: 'Mis clases',
+      icon: BookOpen,
+      href: '/mis-clases',
+      requiresAuth: true,
+    },
     {
       label: 'Explorar clases',
       icon: Compass,
@@ -54,8 +55,8 @@ export function AppSidebar() {
       requiresAuth: false,
     },
     {
-      label: 'Unirme a un salón',
-      icon: LogIn,
+      label: 'Unirme a una clase',
+      icon: DoorOpen,
       href: undefined,
       requiresAuth: true,
       onClick: () => {
@@ -63,14 +64,8 @@ export function AppSidebar() {
       },
     },
     {
-      label: 'Mis notas',
-      icon: NotebookPen,
-      href: '/mis-notas',
-      requiresAuth: true,
-    },
-    {
-      label: 'Transmisiones pasadas',
-      icon: History,
+      label: 'Recomendaciones',
+      icon: Sparkles,
       href: '/grabaciones',
       requiresAuth: false,
     },
@@ -162,10 +157,12 @@ export function AppSidebar() {
                     className="cursor-pointer focus-visible:ring-0 focus-visible:outline-none data-[state=open]:ring-0"
                   >
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-                      {user.name.charAt(0).toUpperCase()}
+                      {(user.username ?? user.name).charAt(0).toUpperCase()}
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium leading-none">{user.name}</span>
+                      <span className="text-sm font-medium leading-none">
+                        {user.username ?? user.name}
+                      </span>
                       <span className="mt-0.5 text-xs capitalize text-muted-foreground">
                         {isProfesor ? 'profesor' : user.role}
                       </span>
@@ -193,7 +190,7 @@ export function AppSidebar() {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer" onClick={logout}>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => { logout(); router.push('/') }}>
                     <LogOut className="size-4" />
                     <span>Cerrar sesión</span>
                   </DropdownMenuItem>

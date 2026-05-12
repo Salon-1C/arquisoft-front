@@ -1,0 +1,71 @@
+'use client'
+
+import { useState } from 'react'
+import { AlignLeft, Film, Paperclip } from 'lucide-react'
+import type { ClassMaterial, ClassRecording } from '@/types/class'
+import ClassRecordingsSection from '@/components/classes/ClassRecordingsSection'
+import ClassMaterialsSection from '@/components/classes/ClassMaterialsSection'
+
+interface ChannelTabsProps {
+  description?: string
+  recordings: ClassRecording[]
+  materials: ClassMaterial[]
+}
+
+type TabId = 'descripcion' | 'grabaciones' | 'material'
+
+interface TabDef {
+  id: TabId
+  label: string
+  Icon: React.ElementType
+}
+
+const TABS: TabDef[] = [
+  { id: 'descripcion', label: 'Descripción',          Icon: AlignLeft  },
+  { id: 'grabaciones', label: 'Transmisiones pasadas', Icon: Film       },
+  { id: 'material',    label: 'Material de apoyo',     Icon: Paperclip  },
+]
+
+export default function ChannelTabs({ description, recordings, materials }: ChannelTabsProps) {
+  const [active, setActive] = useState<TabId>('descripcion')
+
+  return (
+    <div>
+      <div className="flex overflow-x-auto border-b border-border">
+        {TABS.map(({ id, label, Icon }) => {
+          const isActive = active === id
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setActive(id)}
+              className={[
+                'flex shrink-0 items-center gap-2 px-4 py-3 text-sm font-medium transition-colors',
+                isActive
+                  ? '-mb-px border-b-2 border-primary text-primary'
+                  : 'text-muted-foreground hover:text-foreground',
+              ].join(' ')}
+            >
+              <Icon className="size-4" />
+              {label}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="pt-6">
+        {active === 'descripcion' && (
+          description ? (
+            <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground">
+              {description}
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">Sin descripción disponible.</p>
+          )
+        )}
+        {active === 'grabaciones' && <ClassRecordingsSection recordings={recordings} />}
+        {active === 'material'    && <ClassMaterialsSection  materials={materials}  />}
+      </div>
+    </div>
+  )
+}

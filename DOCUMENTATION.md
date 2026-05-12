@@ -73,6 +73,7 @@ OBS / Streaming software
 ```
 NEXT_PUBLIC_API_URL=http://localhost:8080       # Spring Boot
 NEXT_PUBLIC_STREAM_URL=http://localhost:9090    # Go + Gin
+NEXT_PUBLIC_PHOENIX_URL=ws://localhost:4000   # Phoenix (Elixir)
 JWT_SECRET=your-256-bit-secret-here            # Shared between Spring Boot and Go
 ```
 

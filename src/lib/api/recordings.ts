@@ -1,9 +1,10 @@
 import type { RecordingsResponse } from '@/types/recording'
 
 const RECORDINGS_BASE =
+  process.env.RECORDINGS_INTERNAL_URL ??
   process.env.NEXT_PUBLIC_RECORDINGS_URL ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  'http://localhost'
+  process.env.API_INTERNAL_URL ??
+  process.env.NEXT_PUBLIC_API_URL
 
 export async function getRecordings(limit = 50, offset = 0): Promise<RecordingsResponse> {
   const url = `${RECORDINGS_BASE}/api/recordings?limit=${limit}&offset=${offset}`

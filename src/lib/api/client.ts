@@ -1,9 +1,6 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
+import type { ApiResponse } from '@/types/api'
 
-interface ApiResponse<T> {
-  data: T
-  message: string | null
-}
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'
 
 export class ApiError extends Error {
   constructor(

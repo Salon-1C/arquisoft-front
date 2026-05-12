@@ -4,8 +4,10 @@ export interface User {
   id: string
   email: string
   name: string
+  username?: string
   role: UserRole
   avatarUrl?: string
+  onboardingComplete: boolean
 }
 
 export interface Session {
@@ -15,6 +17,7 @@ export interface Session {
 
 export interface AuthContextType {
   user: User | null
+  token: string
   isAuthenticated: boolean
   isLoading: boolean
   login: (session: Session) => void

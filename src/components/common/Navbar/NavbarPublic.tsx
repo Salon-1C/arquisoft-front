@@ -2,9 +2,12 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import ArrowButton from '@/components/ui/ArrowButton'
+import { useAuth } from '@/hooks/useAuth'
+import { Button } from '@/components/ui/button'
 
 export default function NavbarPublic() {
+  const { isAuthenticated, isLoading } = useAuth()
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-white/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-6 py-3 md:px-12 md:py-3">
@@ -19,7 +22,16 @@ export default function NavbarPublic() {
           <span className="text-lg font-semibold text-primary">Blume</span>
         </Link>
 
-        <ArrowButton href="/login">Ingresar</ArrowButton>
+        {!isLoading && !isAuthenticated && (
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/registro">Registrarse</Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link href="/login">Iniciar sesión</Link>
+            </Button>
+          </div>
+        )}
       </div>
     </header>
   )

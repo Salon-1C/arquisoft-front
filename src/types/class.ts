@@ -1,15 +1,34 @@
-export type ClassStatus = 'live' | 'recorded'
-export type ClassType = 'public' | 'private'
-
 export interface Class {
   id: string
-  title: string
-  description: string
+  name: string
+  description?: string
   instructorName: string
   instructorAvatarUrl?: string
-  status: ClassStatus
-  type: ClassType
+  thumbnailUrl?: string
+  isLive: boolean
+  liveStreamId?: string
+}
+
+export interface ClassRecording {
+  id: string
+  title: string
+  description?: string
   thumbnailUrl?: string
   startedAt: string
-  endedAt?: string
+  endedAt: string
+}
+
+export interface ClassMaterial {
+  id: string
+  title: string
+  description?: string
+  fileUrl: string
+  fileType: string
+  createdAt: string
+}
+
+export interface ClassDetail {
+  cls: Class
+  recordings: ClassRecording[]
+  materials: ClassMaterial[]
 }

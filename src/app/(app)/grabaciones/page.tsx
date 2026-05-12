@@ -9,6 +9,17 @@ function formatDate(raw: string): string {
   return date.toLocaleString()
 }
 
+function formatDuration(totalSeconds: number): string {
+  const safe = Number.isFinite(totalSeconds) && totalSeconds > 0 ? Math.floor(totalSeconds) : 0
+  const hours = Math.floor(safe / 3600)
+  const minutes = Math.floor((safe % 3600) / 60)
+  const seconds = safe % 60
+  if (hours > 0) {
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+  }
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
 export default function GrabacionesPage() {
   const [recordings, setRecordings] = useState<Recording[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -58,6 +69,10 @@ export default function GrabacionesPage() {
                   <div>
                     <dt className="inline font-medium text-foreground">Estado: </dt>
                     <dd className="inline capitalize">{rec.status}</dd>
+                  </div>
+                  <div>
+                    <dt className="inline font-medium text-foreground">Duracion: </dt>
+                    <dd className="inline">{formatDuration(rec.durationSec)}</dd>
                   </div>
                 </dl>
                 <div className="mt-4">
