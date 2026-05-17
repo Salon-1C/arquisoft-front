@@ -1,0 +1,56 @@
+name: Deploy blume-wa to ECS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-2
+      ECR_REPOSITORY: blume-wa
+      ECS_CLUSTER: blume
+      ECS_SERVICE: blume-wa
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: aws-actions/amazon-ecr-login@v2
+        id: login-ecr
+
+      - name: Build with public URLs
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          PUBLIC_URL: ${{ vars.PUBLIC_APP_URL }}
+          STREAM_KEY: ${{ vars.STREAM_KEY }}
+        run: |
+          if [ -z "$PUBLIC_URL" ]; then
+            echo "Set repository variable PUBLIC_APP_URL (e.g. http://blume-xxxxx.us-east-2.elb.amazonaws.com)"
+            exit 1
+          fi
+          IMAGE_BASE="$REGISTRY/$ECR_REPOSITORY"
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL="$PUBLIC_URL" \
+            --build-arg NEXT_PUBLIC_STREAM_URL="$PUBLIC_URL" \
+            --build-arg NEXT_PUBLIC_RECORDINGS_URL="$PUBLIC_URL" \
+            --build-arg NEXT_PUBLIC_PHOENIX_URL="$PUBLIC_URL" \
+            --build-arg NEXT_PUBLIC_STREAM_KEY="${STREAM_KEY:-}" \
+            -t "${IMAGE_BASE}:latest" \
+            -t "${IMAGE_BASE}:sha-${GITHUB_SHA}" \
+            .
+          docker push "${IMAGE_BASE}:latest"
+          docker push "${IMAGE_BASE}:sha-${GITHUB_SHA}"
+
+      - name: Force ECS redeployment
+        run: |
+          aws ecs update-service --cluster "$ECS_CLUSTER" --service "$ECS_SERVICE" --force-new-deployment --no-cli-pager
