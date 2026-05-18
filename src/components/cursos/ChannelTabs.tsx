@@ -3,11 +3,14 @@
 import { useState } from 'react'
 import { AlignLeft, Film, GraduationCap, Paperclip } from 'lucide-react'
 import type { ClassGrade, ClassMaterial, ClassRecording } from '@/types/class'
+import { useAuth } from '@/hooks/useAuth'
 import ClassRecordingsSection from '@/components/classes/ClassRecordingsSection'
 import ClassMaterialsSection from '@/components/classes/ClassMaterialsSection'
 import ClassGradesSection from '@/components/classes/ClassGradesSection'
+import ProfessorGradesSection from '@/components/classes/ProfessorGradesSection'
 
 interface ChannelTabsProps {
+  channelId: string
   description?: string
   recordings: ClassRecording[]
   materials: ClassMaterial[]
@@ -29,8 +32,10 @@ const TABS: TabDef[] = [
   { id: 'notas',       label: 'Notas',                 Icon: GraduationCap  },
 ]
 
-export default function ChannelTabs({ description, recordings, materials, grades }: ChannelTabsProps) {
+export default function ChannelTabs({ channelId, description, recordings, materials, grades }: ChannelTabsProps) {
   const [active, setActive] = useState<TabId>('descripcion')
+  const { user } = useAuth()
+  const isProfessor = user?.role === 'profesor'
 
   return (
     <div>
@@ -68,7 +73,11 @@ export default function ChannelTabs({ description, recordings, materials, grades
         )}
         {active === 'grabaciones' && <ClassRecordingsSection recordings={recordings} />}
         {active === 'material'    && <ClassMaterialsSection  materials={materials}  />}
-        {active === 'notas'       && <ClassGradesSection     grades={grades}        />}
+        {active === 'notas'       && (
+          isProfessor
+            ? <ProfessorGradesSection channelId={channelId} />
+            : <ClassGradesSection grades={grades} />
+        )}
       </div>
     </div>
   )

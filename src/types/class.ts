@@ -40,3 +40,9 @@ export interface ClassGrade {
   weight: number
   score: number | null
 }
+
+export interface EnrolledStudent {
+  studentId: string
+  fullName: string
+  email: string
+}

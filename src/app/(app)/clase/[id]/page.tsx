@@ -76,6 +76,7 @@ export default async function ClasePage({
           isLive={stream.status === 'live'}
         />
         <ChannelTabs
+          channelId={stream.channelId}
           description={channelDetail?.cls.description ?? stream.description}
           recordings={channelDetail?.recordings ?? []}
           materials={channelDetail?.materials ?? []}

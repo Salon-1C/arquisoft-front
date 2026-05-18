@@ -55,6 +55,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
 
         <div className="px-5 md:px-8 pt-5 pb-8">
           <ChannelTabs
+            channelId={id}
             description={course.description}
             recordings={recordings}
             materials={classDetail?.materials ?? []}
