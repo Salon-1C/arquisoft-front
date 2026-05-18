@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import type { Stream } from '@/types/stream'
-import { getEnrolledChannelAsClassDetail } from '@/lib/api/channels'
+import { getEnrolledChannelAsClassDetail, getChannelGrades } from '@/lib/api/channels'
 import LiveView from './LiveView'
 import ChannelTabs from '@/components/cursos/ChannelTabs'
 import ClassHeader from '@/components/classes/ClassHeader'
@@ -56,6 +56,7 @@ export default async function ClasePage({
   }
 
   const channelDetail = await getEnrolledChannelAsClassDetail(stream.channelId)
+  const grades = await getChannelGrades(stream.channelId)
   const streamPath = `/live/${stream.id}`
 
   return (
@@ -78,6 +79,7 @@ export default async function ClasePage({
           description={channelDetail?.cls.description ?? stream.description}
           recordings={channelDetail?.recordings ?? []}
           materials={channelDetail?.materials ?? []}
+          grades={grades}
         />
       </main>
       <aside className="w-100 shrink-0 border-l border-[var(--color-border)] overflow-y-auto">

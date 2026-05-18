@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import type { Course, CourseStream } from '@/types/course'
-import type { Class, ClassDetail, ClassMaterial, ClassRecording } from '@/types/class'
+import type { Class, ClassDetail, ClassGrade, ClassMaterial, ClassRecording } from '@/types/class'
 
 const API_BASE = process.env.API_INTERNAL_URL ?? process.env.NEXT_PUBLIC_API_URL
 
@@ -170,5 +170,33 @@ export async function getEnrolledChannelAsClassDetail(id: string): Promise<Class
     return channelToClassDetail(ch)
   } catch {
     return undefined
+  }
+}
+
+interface GradeApiItem {
+  id: number
+  name: string
+  type: string
+  weight: number
+  score: number | null
+}
+
+interface ChannelGradesApiResponse {
+  channelId: string
+  grades: GradeApiItem[]
+}
+
+export async function getChannelGrades(channelId: string): Promise<ClassGrade[]> {
+  try {
+    const response = await serverFetch<ChannelGradesApiResponse>(`/api/canales/${channelId}/notas`)
+    return response.grades.map((g) => ({
+      id: g.id,
+      name: g.name,
+      type: g.type as ClassGrade['type'],
+      weight: g.weight,
+      score: g.score,
+    }))
+  } catch {
+    return []
   }
 }

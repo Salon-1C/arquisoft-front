@@ -32,3 +32,11 @@ export interface ClassDetail {
   recordings: ClassRecording[]
   materials: ClassMaterial[]
 }
+
+export interface ClassGrade {
+  id: number
+  name: string
+  type: 'EXAM' | 'PROJECT' | 'PRESENTATION' | 'QUIZ'
+  weight: number
+  score: number | null
+}

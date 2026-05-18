@@ -1,18 +1,20 @@
 'use client'
 
 import { useState } from 'react'
-import { AlignLeft, Film, Paperclip } from 'lucide-react'
-import type { ClassMaterial, ClassRecording } from '@/types/class'
+import { AlignLeft, Film, GraduationCap, Paperclip } from 'lucide-react'
+import type { ClassGrade, ClassMaterial, ClassRecording } from '@/types/class'
 import ClassRecordingsSection from '@/components/classes/ClassRecordingsSection'
 import ClassMaterialsSection from '@/components/classes/ClassMaterialsSection'
+import ClassGradesSection from '@/components/classes/ClassGradesSection'
 
 interface ChannelTabsProps {
   description?: string
   recordings: ClassRecording[]
   materials: ClassMaterial[]
+  grades: ClassGrade[]
 }
 
-type TabId = 'descripcion' | 'grabaciones' | 'material'
+type TabId = 'descripcion' | 'grabaciones' | 'material' | 'notas'
 
 interface TabDef {
   id: TabId
@@ -21,12 +23,13 @@ interface TabDef {
 }
 
 const TABS: TabDef[] = [
-  { id: 'descripcion', label: 'Descripción',          Icon: AlignLeft  },
-  { id: 'grabaciones', label: 'Transmisiones pasadas', Icon: Film       },
-  { id: 'material',    label: 'Material de apoyo',     Icon: Paperclip  },
+  { id: 'descripcion', label: 'Descripción',          Icon: AlignLeft      },
+  { id: 'grabaciones', label: 'Transmisiones pasadas', Icon: Film           },
+  { id: 'material',    label: 'Material de apoyo',     Icon: Paperclip      },
+  { id: 'notas',       label: 'Notas',                 Icon: GraduationCap  },
 ]
 
-export default function ChannelTabs({ description, recordings, materials }: ChannelTabsProps) {
+export default function ChannelTabs({ description, recordings, materials, grades }: ChannelTabsProps) {
   const [active, setActive] = useState<TabId>('descripcion')
 
   return (
@@ -65,6 +68,7 @@ export default function ChannelTabs({ description, recordings, materials }: Chan
         )}
         {active === 'grabaciones' && <ClassRecordingsSection recordings={recordings} />}
         {active === 'material'    && <ClassMaterialsSection  materials={materials}  />}
+        {active === 'notas'       && <ClassGradesSection     grades={grades}        />}
       </div>
     </div>
   )

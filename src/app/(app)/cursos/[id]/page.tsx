@@ -1,5 +1,5 @@
-import { getEnrolledChannelAsCourse, getEnrolledChannelAsClassDetail, getPublicChannelById, getPublicChannelAsClassDetail } from '@/lib/api/channels'
-import type { ClassRecording } from '@/types/class'
+import { getEnrolledChannelAsCourse, getEnrolledChannelAsClassDetail, getPublicChannelById, getPublicChannelAsClassDetail, getChannelGrades } from '@/lib/api/channels'
+import type { ClassGrade, ClassRecording } from '@/types/class'
 import type { Course } from '@/types/course'
 import CourseHeader from '@/components/cursos/CourseHeader'
 import LiveStreamBanner from '@/components/cursos/LiveStreamBanner'
@@ -25,6 +25,8 @@ export default async function CoursePage({ params }: CoursePageProps) {
   const classDetail = enrolled
     ? await getEnrolledChannelAsClassDetail(id)
     : await getPublicChannelAsClassDetail(id)
+
+  const grades: ClassGrade[] = await getChannelGrades(id)
 
   const featuredStream = course.streams[0] ?? null
 
@@ -56,6 +58,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
             description={course.description}
             recordings={recordings}
             materials={classDetail?.materials ?? []}
+            grades={grades}
           />
         </div>
       </div>
